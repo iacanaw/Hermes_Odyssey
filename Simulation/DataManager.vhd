@@ -7,22 +7,6 @@
 -- HISTORY      : Version 0.1 - Jul 9th, 2015                                       --
 --              : Version 0.2.1 - Set 18th, 2015                                    --
 --------------------------------------------------------------------------------------
-
-
---entity NOC is
---port(
---    clock         : in  regNrot;
---    reset         : in  std_logic;
---    clock_rxLocal : in  regNrot;
---    rxLocal       : in  regNrot;
---    data_inLocal  : in  arrayNrot_regflit;
---    credit_oLocal : out regNrot;
---    clock_txLocal : out regNrot;
---    txLocal       : out regNrot;
---    data_outLocal : out arrayNrot_regflit;
---    credit_iLocal : in  regNrot);
---end NOC;
-
 library ieee;
 use ieee.std_logic_1164.all;
 use std.textio.all;
@@ -38,11 +22,15 @@ entity DataManager is
         clock : in std_logic;
         reset : in std_logic;
         
-        data_in : in regflit;
-        control_in : in std_logic_vector(CONTROL_WIDTH-1 downto 0);
-        
-        data_out : out std_logic_vector(DATA_WIDTH-1 downto 0);
-        control_out : out std_logic_vector(CONTROL_WIDTH-1 downto 0)
+        --input interface
+        rx :        in std_logic;
+        data_in :   in regflit;
+        credit_o :  out std_logic;
+
+        --output interface
+        tx :        out std_logic;
+        data_out :  out regflit;
+        credit_i :  in std_logic
     );
 end DataManager;
 
@@ -51,14 +39,14 @@ begin
     SEND: block
         type state is (S0, S1);
         signal currentState : state;
-        signal words : std_logic_vector(DATA_WIDTH+3 downto 0); --  eop + word 
+        signal words : regflit;
         file flitFile : text open read_mode is fileNameIn;
     begin
-        process(clk, rst)
+        process(clock, reset)
             variable flitLine   : line;
             variable str        : string(1 to 5);
         begin 
-            if rst = '1' then
+            if reset = '1' then
                 currentState <= S1;
                 words <= (OTHERS=>'0');
                 -- if not(endfile(flitFile)) then
@@ -68,11 +56,11 @@ begin
                 -- else
                     -- words <= (OTHERS=>'0');
                 -- end if;
-            elsif rising_edge(clk) then
+            elsif rising_edge(clock) then
                 case currentState is
                     when S0 =>
-                        if not(endfile(flitFile)) or (control_in(STALL_GO)='0') then
-                            if(control_in(STALL_GO)='1') then
+                        if not(endfile(flitFile)) or (credit_i='0') then
+                            if(credit_i='1') then
                                 readline(flitFile, flitLine);
                                 read(flitLine, str);
                                 words <= StringToStdLogicVector(str);
@@ -98,34 +86,33 @@ begin
             end if;
         end process;
         data_out <= words(DATA_WIDTH-1 downto 0);
-        control_out(EOP) <= words(DATA_WIDTH);
-        control_out(TX) <= '1' when currentState = S0 else '0';
+        tx <= '1' when currentState = S0 else '0';
     end block SEND;
     
     RECIEVE: block
         type state is (S0);
         signal currentState : state;
-        signal completeLine : std_logic_vector(DATA_WIDTH+3 downto 0);
+        signal completeLine : regflit;
         file flitFile : text open write_mode is fileNameOut;
     begin
-        completeLine <= b"000" & control_in(EOP) & data_in;
-        process(clk, rst)
+        completeLine <= data_in;
+        process(clock, reset)
             variable flitLine   : line;
             variable str        : string (1 to 9);
         begin
-            if rst = '1' then
+            if reset = '1' then
                 currentState <= S0;
-                control_out(STALL_GO) <= '0';
-            elsif rising_edge(clk) then
+                credit_o <= '0';
+            elsif rising_edge(clock) then
                 case currentState is
                     when S0 =>
-                        if control_in(RX) = '1' then
+                        if rx = '1' then
                             write(flitLine, StdLogicVectorToString(completeLine));
                             writeline(flitFile, flitLine);
                         end if;
                         currentState <= S0;
                 end case;
-                control_out(STALL_GO) <= '1';
+                credit_o <= '1';
             end if;
         end process;
     end block RECIEVE;

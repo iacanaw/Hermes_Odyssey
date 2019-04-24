@@ -1,2 +1,2 @@
-# Hermes_Odyssey
+# Hermes Odyssey
 Hermes NoC with a Hardware Trojan
