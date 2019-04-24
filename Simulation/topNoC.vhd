@@ -142,144 +142,238 @@ begin
 		data_outLocal => data_out,
 		credit_iLocal => credit_i);
 
-	cim00: Entity work.inputmodule
-	port map(
-		clock       => clock(N0000),
-		reset       => reset,
-		finish      => finish,
-		outclock0   => clock_rx(N0000),
-		outtx0      => rx(N0000),
-		outdata0    => data_in(N0000),
-		incredit0   => credit_o(N0000),
-		outclock1   => clock_rx(N0100),
-		outtx1      => rx(N0100),
-		outdata1    => data_in(N0100),
-		incredit1   => credit_o(N0100),
-		outclock2   => clock_rx(N0200),
-		outtx2      => rx(N0200),
-		outdata2    => data_in(N0200),
-		incredit2   => credit_o(N0200),
-		outclock3   => clock_rx(N0300),
-		outtx3      => rx(N0300),
-		outdata3    => data_in(N0300),
-		incredit3   => credit_o(N0300),
-		outclock4   => clock_rx(N0001),
-		outtx4      => rx(N0001),
-		outdata4    => data_in(N0001),
-		incredit4   => credit_o(N0001),
-		outclock5   => clock_rx(N0101),
-		outtx5      => rx(N0101),
-		outdata5    => data_in(N0101),
-		incredit5   => credit_o(N0101),
-		outclock6   => clock_rx(N0201),
-		outtx6      => rx(N0201),
-		outdata6    => data_in(N0201),
-		incredit6   => credit_o(N0201),
-		outclock7   => clock_rx(N0301),
-		outtx7      => rx(N0301),
-		outdata7    => data_in(N0301),
-		incredit7   => credit_o(N0301),
-		outclock8   => clock_rx(N0002),
-		outtx8      => rx(N0002),
-		outdata8    => data_in(N0002),
-		incredit8   => credit_o(N0002),
-		outclock9   => clock_rx(N0102),
-		outtx9      => rx(N0102),
-		outdata9    => data_in(N0102),
-		incredit9   => credit_o(N0102),
-		outclock10   => clock_rx(N0202),
-		outtx10      => rx(N0202),
-		outdata10    => data_in(N0202),
-		incredit10   => credit_o(N0202),
-		outclock11   => clock_rx(N0302),
-		outtx11      => rx(N0302),
-		outdata11    => data_in(N0302),
-		incredit11   => credit_o(N0302),
-		outclock12   => clock_rx(N0003),
-		outtx12      => rx(N0003),
-		outdata12    => data_in(N0003),
-		incredit12   => credit_o(N0003),
-		outclock13   => clock_rx(N0103),
-		outtx13      => rx(N0103),
-		outdata13    => data_in(N0103),
-		incredit13   => credit_o(N0103),
-		outclock14   => clock_rx(N0203),
-		outtx14      => rx(N0203),
-		outdata14    => data_in(N0203),
-		incredit14   => credit_o(N0203),
-		outclock15   => clock_rx(N0303),
-		outtx15      => rx(N0303),
-		outdata15    => data_in(N0303),
-		incredit15   => credit_o(N0303));
+	clock_rx <= clock;
+	clock_tx <= clock;
 
-	com00: Entity work.outmodule
-	port map(
-		clock       => clock(N0000),
-		reset       => reset,
-		finish      => finish,
-		inClock0    => clock_tx(N0000),
-		inTx0       => tx(N0000),
-		inData0     => data_out(N0000),
-		outCredit0  => credit_i(N0000),
-		inClock1    => clock_tx(N0100),
-		inTx1       => tx(N0100),
-		inData1     => data_out(N0100),
-		outCredit1  => credit_i(N0100),
-		inClock2    => clock_tx(N0200),
-		inTx2       => tx(N0200),
-		inData2     => data_out(N0200),
-		outCredit2  => credit_i(N0200),
-		inClock3    => clock_tx(N0300),
-		inTx3       => tx(N0300),
-		inData3     => data_out(N0300),
-		outCredit3  => credit_i(N0300),
-		inClock4    => clock_tx(N0001),
-		inTx4       => tx(N0001),
-		inData4     => data_out(N0001),
-		outCredit4  => credit_i(N0001),
-		inClock5    => clock_tx(N0101),
-		inTx5       => tx(N0101),
-		inData5     => data_out(N0101),
-		outCredit5  => credit_i(N0101),
-		inClock6    => clock_tx(N0201),
-		inTx6       => tx(N0201),
-		inData6     => data_out(N0201),
-		outCredit6  => credit_i(N0201),
-		inClock7    => clock_tx(N0301),
-		inTx7       => tx(N0301),
-		inData7     => data_out(N0301),
-		outCredit7  => credit_i(N0301),
-		inClock8    => clock_tx(N0002),
-		inTx8       => tx(N0002),
-		inData8     => data_out(N0002),
-		outCredit8  => credit_i(N0002),
-		inClock9    => clock_tx(N0102),
-		inTx9       => tx(N0102),
-		inData9     => data_out(N0102),
-		outCredit9  => credit_i(N0102),
-		inClock10    => clock_tx(N0202),
-		inTx10       => tx(N0202),
-		inData10     => data_out(N0202),
-		outCredit10  => credit_i(N0202),
-		inClock11    => clock_tx(N0302),
-		inTx11       => tx(N0302),
-		inData11     => data_out(N0302),
-		outCredit11  => credit_i(N0302),
-		inClock12    => clock_tx(N0003),
-		inTx12       => tx(N0003),
-		inData12     => data_out(N0003),
-		outCredit12  => credit_i(N0003),
-		inClock13    => clock_tx(N0103),
-		inTx13       => tx(N0103),
-		inData13     => data_out(N0103),
-		outCredit13  => credit_i(N0103),
-		inClock14    => clock_tx(N0203),
-		inTx14       => tx(N0203),
-		inData14     => data_out(N0203),
-		outCredit14  => credit_i(N0203),
-		inClock15    => clock_tx(N0303),
-		inTx15       => tx(N0303),
-		inData15     => data_out(N0303),
-		outCredit15  => credit_i(N0303));
+	DM0000: Entity work.DataManager
+	generic map(fileNameIn => "Simulation/data/fileIn0000.txt",
+                fileNameOut => "Simulation/data/fileOut0000.txt")
+    port map(
+        clock  		=> clock(N0000),
+        reset 		=> reset,
+        rx 			=> tx(N0000),
+        data_in		=> data_out(N0000),
+        credit_o    => credit_i(N0000),
+        tx			=> rx(N0000),
+        data_out	=> data_in(N0000),
+        credit_i 	=> credit_o(N0000)
+    );
+
+    DM0001: Entity work.DataManager
+	generic map(fileNameIn => "Simulation/data/fileIn0001.txt",
+                fileNameOut => "Simulation/data/fileOut0001.txt")
+    port map(
+        clock  		=> clock(N0001),
+        reset 		=> reset,
+        rx 			=> tx(N0001),
+        data_in		=> data_out(N0001),
+        credit_o    => credit_i(N0001),
+        tx			=> rx(N0001),
+        data_out	=> data_in(N0001),
+        credit_i 	=> credit_o(N0001)
+    );
+
+    DM0002: Entity work.DataManager
+	generic map(fileNameIn => "Simulation/data/fileIn0002.txt",
+                fileNameOut => "Simulation/data/fileOut0002.txt")
+    port map(
+        clock  		=> clock(N0002),
+        reset 		=> reset,
+        rx 			=> tx(N0002),
+        data_in		=> data_out(N0002),
+        credit_o    => credit_i(N0002),
+        tx			=> rx(N0002),
+        data_out	=> data_in(N0002),
+        credit_i 	=> credit_o(N0002)
+    );
+
+    DM0003: Entity work.DataManager
+	generic map(fileNameIn => "Simulation/data/fileIn0003.txt",
+                fileNameOut => "Simulation/data/fileOut0003.txt")
+    port map(
+        clock  		=> clock(N0003),
+        reset 		=> reset,
+        rx 			=> tx(N0003),
+        data_in		=> data_out(N0003),
+        credit_o    => credit_i(N0003),
+        tx			=> rx(N0003),
+        data_out	=> data_in(N0003),
+        credit_i 	=> credit_o(N0003)
+    );
+
+    ---------
+
+    DM0100: Entity work.DataManager
+	generic map(fileNameIn => "Simulation/data/fileIn0100.txt",
+                fileNameOut => "Simulation/data/fileOut0100.txt")
+    port map(
+        clock  		=> clock(N0100),
+        reset 		=> reset,
+        rx 			=> tx(N0100),
+        data_in		=> data_out(N0100),
+        credit_o    => credit_i(N0100),
+        tx			=> rx(N0100),
+        data_out	=> data_in(N0100),
+        credit_i 	=> credit_o(N0100)
+    );
+
+    DM0101: Entity work.DataManager
+	generic map(fileNameIn => "Simulation/data/fileIn0101.txt",
+                fileNameOut => "Simulation/data/fileOut0101.txt")
+    port map(
+        clock  		=> clock(N0101),
+        reset 		=> reset,
+        rx 			=> tx(N0101),
+        data_in		=> data_out(N0101),
+        credit_o    => credit_i(N0101),
+        tx			=> rx(N0101),
+        data_out	=> data_in(N0101),
+        credit_i 	=> credit_o(N0101)
+    );
+
+    DM0102: Entity work.DataManager
+	generic map(fileNameIn => "Simulation/data/fileIn0102.txt",
+                fileNameOut => "Simulation/data/fileOut0102.txt")
+    port map(
+        clock  		=> clock(N0102),
+        reset 		=> reset,
+        rx 			=> tx(N0102),
+        data_in		=> data_out(N0102),
+        credit_o    => credit_i(N0102),
+        tx			=> rx(N0102),
+        data_out	=> data_in(N0102),
+        credit_i 	=> credit_o(N0102)
+    );
+
+    DM0103: Entity work.DataManager
+	generic map(fileNameIn => "Simulation/data/fileIn0103.txt",
+                fileNameOut => "Simulation/data/fileOut0103.txt")
+    port map(
+        clock  		=> clock(N0103),
+        reset 		=> reset,
+        rx 			=> tx(N0103),
+        data_in		=> data_out(N0103),
+        credit_o    => credit_i(N0103),
+        tx			=> rx(N0103),
+        data_out	=> data_in(N0103),
+        credit_i 	=> credit_o(N0103)
+    );
+
+    ---------
+
+    DM0200: Entity work.DataManager
+	generic map(fileNameIn => "Simulation/data/fileIn0200.txt",
+                fileNameOut => "Simulation/data/fileOut0200.txt")
+    port map(
+        clock  		=> clock(N0200),
+        reset 		=> reset,
+        rx 			=> tx(N0200),
+        data_in		=> data_out(N0200),
+        credit_o    => credit_i(N0200),
+        tx			=> rx(N0200),
+        data_out	=> data_in(N0200),
+        credit_i 	=> credit_o(N0200)
+    );
+
+    DM0201: Entity work.DataManager
+	generic map(fileNameIn => "Simulation/data/fileIn0201.txt",
+                fileNameOut => "Simulation/data/fileOut0201.txt")
+    port map(
+        clock  		=> clock(N0201),
+        reset 		=> reset,
+        rx 			=> tx(N0201),
+        data_in		=> data_out(N0201),
+        credit_o    => credit_i(N0201),
+        tx			=> rx(N0201),
+        data_out	=> data_in(N0201),
+        credit_i 	=> credit_o(N0201)
+    );
+
+    DM0202: Entity work.DataManager
+	generic map(fileNameIn => "Simulation/data/fileIn0202.txt",
+                fileNameOut => "Simulation/data/fileOut0202.txt")
+    port map(
+        clock  		=> clock(N0202),
+        reset 		=> reset,
+        rx 			=> tx(N0202),
+        data_in		=> data_out(N0202),
+        credit_o    => credit_i(N0202),
+        tx			=> rx(N0202),
+        data_out	=> data_in(N0202),
+        credit_i 	=> credit_o(N0202)
+    );
+
+    DM0203: Entity work.DataManager
+	generic map(fileNameIn => "Simulation/data/fileIn0203.txt",
+                fileNameOut => "Simulation/data/fileOut0203.txt")
+    port map(
+        clock  		=> clock(N0203),
+        reset 		=> reset,
+        rx 			=> tx(N0203),
+        data_in		=> data_out(N0203),
+        credit_o    => credit_i(N0203),
+        tx			=> rx(N0203),
+        data_out	=> data_in(N0203),
+        credit_i 	=> credit_o(N0203)
+    );
+
+    ---------
+
+    DM0300: Entity work.DataManager
+	generic map(fileNameIn => "Simulation/data/fileIn0300.txt",
+                fileNameOut => "Simulation/data/fileOut0300.txt")
+    port map(
+        clock  		=> clock(N0300),
+        reset 		=> reset,
+        rx 			=> tx(N0300),
+        data_in		=> data_out(N0300),
+        credit_o    => credit_i(N0300),
+        tx			=> rx(N0300),
+        data_out	=> data_in(N0300),
+        credit_i 	=> credit_o(N0300)
+    );
+
+    DM0301: Entity work.DataManager
+	generic map(fileNameIn => "Simulation/data/fileIn0301.txt",
+                fileNameOut => "Simulation/data/fileOut0301.txt")
+    port map(
+        clock  		=> clock(N0301),
+        reset 		=> reset,
+        rx 			=> tx(N0301),
+        data_in		=> data_out(N0301),
+        credit_o    => credit_i(N0301),
+        tx			=> rx(N0301),
+        data_out	=> data_in(N0301),
+        credit_i 	=> credit_o(N0301)
+    );
+
+    DM0302: Entity work.DataManager
+	generic map(fileNameIn => "Simulation/data/fileIn0302.txt",
+                fileNameOut => "Simulation/data/fileOut0302.txt")
+    port map(
+        clock  		=> clock(N0302),
+        reset 		=> reset,
+        rx 			=> tx(N0302),
+        data_in		=> data_out(N0302),
+        credit_o    => credit_i(N0302),
+        tx			=> rx(N0302),
+        data_out	=> data_in(N0302),
+        credit_i 	=> credit_o(N0302)
+    );
+
+    DM0303: Entity work.DataManager
+	generic map(fileNameIn => "Simulation/data/fileIn0303.txt",
+                fileNameOut => "Simulation/data/fileOut0303.txt")
+    port map(
+        clock  		=> clock(N0303),
+        reset 		=> reset,
+        rx 			=> tx(N0303),
+        data_in		=> data_out(N0303),
+        credit_o    => credit_i(N0303),
+        tx			=> rx(N0303),
+        data_out	=> data_in(N0303),
+        credit_i 	=> credit_o(N0303)
+    );
+
 
 end topNoC;

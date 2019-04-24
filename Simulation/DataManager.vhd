@@ -85,7 +85,7 @@ begin
                 end case;
             end if;
         end process;
-        data_out <= words(DATA_WIDTH-1 downto 0);
+        data_out <= words;
         tx <= '1' when currentState = S0 else '0';
     end block SEND;
     

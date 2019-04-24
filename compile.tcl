@@ -8,26 +8,24 @@ set compiler vcom
 
 set sourceFiles {
     
-    /NOC/Hermes_package.vhd
-    /NOC/Hermes_buffer.vhd
-    /NOC/Hermes_crossbar.vhd
-    /NOC/Hermes_switchcontrol.vhd
-    /NOC/RouterBC.vhd
-    /NOC/RouterBL.vhd
-    /NOC/RouterBR.vhd
-    /NOC/RouterCC.vhd
-    /NOC/RouterCL.vhd
-    /NOC/RouterCR.vhd
-    /NOC/RouterTC.vhd
-    /NOC/RouterTL.vhd
-    /NOC/RouterTR.vhd
-    /NOC/HardwareTrojan.vhd
-    /NOC/NOC.vhd
-
-    /Simulation/Text_Package.vhd
-    /Simulation/DataManager.vhd
-
-    /Simulation/topNoC.vhd
+    NOC/Hermes_package.vhd
+    NOC/Hermes_buffer.vhd
+    NOC/Hermes_crossbar.vhd
+    NOC/Hermes_switchcontrol.vhd
+    NOC/RouterBC.vhd
+    NOC/RouterBL.vhd
+    NOC/RouterBR.vhd
+    NOC/RouterCC.vhd
+    NOC/RouterCL.vhd
+    NOC/RouterCR.vhd
+    NOC/RouterTC.vhd
+    NOC/RouterTL.vhd
+    NOC/RouterTR.vhd
+    NOC/HardwareTrojan.vhd
+    NOC/NOC.vhd
+    Simulation/Text_Package.vhd
+    Simulation/DataManager.vhd
+    Simulation/topNoC.vhd
 
 
 }
