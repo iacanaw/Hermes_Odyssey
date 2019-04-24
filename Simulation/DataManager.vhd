@@ -44,7 +44,7 @@ begin
     begin
         process(clock, reset)
             variable flitLine   : line;
-            variable str        : string(1 to 5);
+            variable str        : string(1 to 4);
         begin 
             if reset = '1' then
                 currentState <= S1;
@@ -98,7 +98,6 @@ begin
         completeLine <= data_in;
         process(clock, reset)
             variable flitLine   : line;
-            variable str        : string (1 to 9);
         begin
             if reset = '1' then
                 currentState <= S0;
