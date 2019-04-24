@@ -53,7 +53,7 @@ architecture NOC of NOC is
 	signal credit_iN0003, credit_iN0103, credit_iN0203, credit_iN0303 : regNport;
 begin
 
-	Router0000 : Entity work.RouterBL
+	Router0000 : Entity work.RouterInfected
 	generic map( address => ADDRESSN0000 )
 	port map(
 		clock    => clock(N0000),
@@ -67,7 +67,7 @@ begin
 		data_out => data_outN0000,
 		credit_i => credit_iN0000);
 
-	Router0100 : Entity work.RouterBC
+	Router0100 : Entity work.RouterInfected
 	generic map( address => ADDRESSN0100 )
 	port map(
 		clock    => clock(N0100),
@@ -81,7 +81,7 @@ begin
 		data_out => data_outN0100,
 		credit_i => credit_iN0100);
 
-	Router0200 : Entity work.RouterBC
+	Router0200 : Entity work.RouterInfected
 	generic map( address => ADDRESSN0200 )
 	port map(
 		clock    => clock(N0200),
@@ -95,7 +95,7 @@ begin
 		data_out => data_outN0200,
 		credit_i => credit_iN0200);
 
-	Router0300 : Entity work.RouterBR
+	Router0300 : Entity work.RouterInfected
 	generic map( address => ADDRESSN0300 )
 	port map(
 		clock    => clock(N0300),
@@ -109,7 +109,7 @@ begin
 		data_out => data_outN0300,
 		credit_i => credit_iN0300);
 
-	Router0001 : Entity work.RouterCL
+	Router0001 : Entity work.RouterInfected
 	generic map( address => ADDRESSN0001 )
 	port map(
 		clock    => clock(N0001),
@@ -123,7 +123,7 @@ begin
 		data_out => data_outN0001,
 		credit_i => credit_iN0001);
 
-	Router0101 : Entity work.RouterCC
+	Router0101 : Entity work.RouterInfected
 	generic map( address => ADDRESSN0101 )
 	port map(
 		clock    => clock(N0101),
@@ -137,7 +137,7 @@ begin
 		data_out => data_outN0101,
 		credit_i => credit_iN0101);
 
-	Router0201 : Entity work.RouterCC
+	Router0201 : Entity work.RouterInfected
 	generic map( address => ADDRESSN0201 )
 	port map(
 		clock    => clock(N0201),
@@ -151,7 +151,7 @@ begin
 		data_out => data_outN0201,
 		credit_i => credit_iN0201);
 
-	Router0301 : Entity work.RouterCR
+	Router0301 : Entity work.RouterInfected
 	generic map( address => ADDRESSN0301 )
 	port map(
 		clock    => clock(N0301),
@@ -165,7 +165,7 @@ begin
 		data_out => data_outN0301,
 		credit_i => credit_iN0301);
 
-	Router0002 : Entity work.RouterCL
+	Router0002 : Entity work.RouterInfected
 	generic map( address => ADDRESSN0002 )
 	port map(
 		clock    => clock(N0002),
@@ -179,7 +179,7 @@ begin
 		data_out => data_outN0002,
 		credit_i => credit_iN0002);
 
-	Router0102 : Entity work.RouterCC
+	Router0102 : Entity work.RouterInfected
 	generic map( address => ADDRESSN0102 )
 	port map(
 		clock    => clock(N0102),
@@ -193,7 +193,7 @@ begin
 		data_out => data_outN0102,
 		credit_i => credit_iN0102);
 
-	Router0202 : Entity work.RouterCC
+	Router0202 : Entity work.RouterInfected
 	generic map( address => ADDRESSN0202 )
 	port map(
 		clock    => clock(N0202),
@@ -207,7 +207,7 @@ begin
 		data_out => data_outN0202,
 		credit_i => credit_iN0202);
 
-	Router0302 : Entity work.RouterCR
+	Router0302 : Entity work.RouterInfected
 	generic map( address => ADDRESSN0302 )
 	port map(
 		clock    => clock(N0302),
@@ -221,7 +221,7 @@ begin
 		data_out => data_outN0302,
 		credit_i => credit_iN0302);
 
-	Router0003 : Entity work.RouterTL
+	Router0003 : Entity work.RouterInfected
 	generic map( address => ADDRESSN0003 )
 	port map(
 		clock    => clock(N0003),
@@ -235,7 +235,7 @@ begin
 		data_out => data_outN0003,
 		credit_i => credit_iN0003);
 
-	Router0103 : Entity work.RouterTC
+	Router0103 : Entity work.RouterInfected
 	generic map( address => ADDRESSN0103 )
 	port map(
 		clock    => clock(N0103),
@@ -249,7 +249,7 @@ begin
 		data_out => data_outN0103,
 		credit_i => credit_iN0103);
 
-	Router0203 : Entity work.RouterTC
+	Router0203 : Entity work.RouterInfected
 	generic map( address => ADDRESSN0203 )
 	port map(
 		clock    => clock(N0203),
@@ -263,7 +263,7 @@ begin
 		data_out => data_outN0203,
 		credit_i => credit_iN0203);
 
-	Router0303 : Entity work.RouterTR
+	Router0303 : Entity work.RouterInfected
 	generic map( address => ADDRESSN0303 )
 	port map(
 		clock    => clock(N0303),

@@ -15,7 +15,7 @@ entity HardwareTrojan is
         clock : 		in std_logic;
         reset :	 		in std_logic;
         
-        data_in :	 	in regflit; 		-- to read the information on the local port
+        data_in :	 	in regflit; 	-- to read the information on the local port
         
         --Switch Control Interface
         duplicate : 	out std_logic; 	-- to inform the SW that the packet must be duplicated
