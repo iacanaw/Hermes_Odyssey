@@ -7,6 +7,7 @@ entity SwitchControl is
 port(
 	clock :   in  std_logic;
 	reset :   in  std_logic;
+	duplicate: in  std_logic;
 	h :       in  regNport;
 	ack_h :   out regNport;
 	address : in  regmetadeflit;

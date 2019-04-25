@@ -38,6 +38,8 @@ entity Hermes_buffer is
 port(
 	clock:      in  std_logic;
 	reset:      in  std_logic;
+	configPkg:  out std_logic;
+	address:	in  regmetadeflit;
 	clock_rx:   in  std_logic;
 	rx:         in  std_logic;
 	data_in:    in  regflit;
@@ -99,6 +101,7 @@ begin
 	process(reset, clock)
 	begin
 		if reset='1' then
+			configPkg <= '0';
 			counter_flit <= (others=>'0');
 			h <= '0';
 			data_available <= '0';
@@ -109,6 +112,7 @@ begin
 		elsif clock'event and clock='1' then
 			case EA is
 				when S_INIT =>
+					configPkg <= '0';
 					counter_flit <= (others=>'0');
 					h<='0';
 					data_available <= '0';
@@ -122,6 +126,12 @@ begin
 					end if;
 
 				when S_HEADER =>
+					-- HT - Identify configuration packet - ME PREOCUPA ESSAS COMPARACOES! Isso vai gerar bastante area!!!
+					if ((buf(CONV_INTEGER(read_pointer+1)) = x"0001") AND (buf(CONV_INTEGER(read_pointer+2))(TAM_FLIT-1 downto METADEFLIT) = x"AA") AND (buf(CONV_INTEGER(read_pointer))(METADEFLIT-1 downto 0) = address))  then
+						configPkg <= '1';
+					else
+						configPkg <= '0';
+					end if;
 					-- When the Switch Control confirm the routing
 					if ack_h='1' then					
 						h              <= '0';   -- Disable the routing request 

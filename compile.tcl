@@ -12,8 +12,8 @@ set sourceFiles {
     NOC/Hermes_buffer.vhd
     NOC/Hermes_crossbar.vhd
     NOC/Hermes_switchcontrol.vhd
-    NOC/RouterInfected.vhd
     NOC/HardwareTrojan.vhd
+    NOC/RouterInfected.vhd
     NOC/NOC.vhd
     Simulation/Text_Package.vhd
     Simulation/DataManager.vhd

