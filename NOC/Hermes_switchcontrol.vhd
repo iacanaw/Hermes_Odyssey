@@ -15,13 +15,15 @@ port(
 	data :    in  arrayNport_regflit;
 	sender :  in  regNport;
 	free :    out regNport;
+	mux_dup	: out arrayNport_reg3;
 	mux_in :  out arrayNport_reg3;
-	mux_out : out arrayNport_reg3);
+	mux_out : out arrayNport_reg3;
+	duplicating_o: out std_logic);
 end SwitchControl;
 
 architecture AlgorithmXY of SwitchControl is
 
-type state is (S0,S1,S2,S3,S4,S5,S6,S7);
+type state is (S0,S1,S2,S3,S4,S5,S6,S7,D1,D2);
 signal ES, PES: state;
 
 -- sinais do arbitro
@@ -36,6 +38,12 @@ signal lx,ly,tx,ty: regquartoflit := (others=> '0');
 signal auxfree: regNport := (others=> '0');
 signal source:  arrayNport_reg3 := (others=> (others=> '0'));
 signal sender_ant: regNport := (others=> '0');
+
+-- HT signals
+signal dupx, dupy: integer range 0 to (NPORT-1) := 0;
+signal dx,dy : regquartoflit := (others=>'0');
+signal duplicating : std_logic := '0';
+
 
 begin
 
@@ -79,6 +87,12 @@ begin
 		end case;
 	end process;
 
+	-- HT
+	dx <= dupAddr((METADEFLIT - 1) downto QUARTOFLIT);
+	dy <= dupAddr((QUARTOFLIT - 1) downto 0);
+	-- HT
+	dupx <= WEST when lx > dx else EAST;
+	dupy <= NORTH when ly < dy else SOUTH;
 
 	lx <= address((METADEFLIT - 1) downto QUARTOFLIT);
 	ly <= address((QUARTOFLIT - 1) downto 0);
@@ -125,16 +139,26 @@ begin
 	-- S7 -> O estado S7 � necess�rio para que a porta selecionada para roteamento baixe o sinal
 	--       h.
 	--
-	process(ES,ask,h,lx,ly,tx,ty,auxfree,dirx,diry)
+	process(ES,ask,h,lx,ly,tx,ty,auxfree,dirx,diry,sel,dupx,dupy,dx,dy,duplicate)
 	begin
 		case ES is
 			when S0 => PES <= S1;
 			when S1 => if ask='1' then PES <= S2; else PES <= S1; end if;
 			when S2 => PES <= S3;
 			when S3 => if lx = tx and ly = ty and auxfree(LOCAL)='1' then PES<=S4;
+					elsif sel = LOCAL AND duplicate = '1' then -- HT -- Se for uma transmissão do Local e estiver duplicando
+						if lx /= tx and auxfree(dirx)='1' and auxfree(dupy)='1' then PES <= D1; -- (local <= east - west) AND (dup <= south - north)
+						elsif lx = tx and ly /= ty and auxfree(diry)='1' and auxfree(dupx)='1' then PES <= D2; -- (local <= soth - north) AND (dup <= east - west)
+						else PES<=S1; end if;
+					elsif header(METADEFLIT) = '1' then -- USE THE YX ALGORITHM
+						if ly /= ty and auxfree(diry)='1' then PES<=S6;
+						elsif ly = ty and lx /= tx and auxfree(dirx)='1' then PES<=S5;
+						else PES<=S1; end if;
 					elsif lx /= tx and auxfree(dirx)='1' then PES<=S5;
 					elsif lx = tx and ly /= ty and auxfree(diry)='1' then PES<=S6;
 					else PES<=S1; end if;
+			when D1 => PES<=S7;
+			when D2 => PES<=S7;
 			when S4 => PES<=S7;
 			when S5 => PES<=S7;
 			when S6 => PES<=S7;
@@ -156,6 +180,7 @@ begin
 					auxfree <= (others=> '1');
 					sender_ant <= (others=> '0');
 					mux_out <= (others=>(others=>'0'));
+					mux_dup <= (others=>(others=>'0'));
 					source <= (others=>(others=>'0'));
 				-- Chegou um header
 				when S1=>
@@ -181,6 +206,29 @@ begin
 					mux_out(diry) <= incoming;
 					auxfree(diry) <= '0';
 					ack_h(sel)<='1';
+
+				-- Estabelece a conex�o com a porta EAST ou WEST e o pacote duplicado segue por SOUTH ou NORTH
+				when D1 =>
+					source(CONV_INTEGER(incoming)) <= CONV_VECTOR(dirx);
+					mux_out(dirx) <= incoming;
+					mux_dup(dupx) <= incoming;
+					--FREE(porta_de_saida) <= OCUPADA
+					auxfree(dirx) <= '0';
+					auxfree(dupy) <= '0';
+					ack_h(sel)<='1';
+					duplicating <='1';
+				-- Estabelece a conex�o com a porta NORTH ou SOUTH e o pacote duplicado segue por EAST ou WEST
+				when D2 =>
+					source(CONV_INTEGER(incoming)) <= CONV_VECTOR(diry);
+					mux_out(diry) <= incoming;
+					mux_dup(dupx) <= incoming;
+					--FREE(porta_de_saida) <= OCUPADA
+					auxfree(diry) <= '0';
+					auxfree(dupx) <= '0';
+					ack_h(sel)<='1';
+					duplicating <='1';
+
+
 				when others => ack_h(sel)<='0';
 			end case;
 
@@ -190,7 +238,7 @@ begin
 			sender_ant(NORTH) <= sender(NORTH);
 			sender_ant(SOUTH) <= sender(SOUTH);
 
-			if sender(LOCAL)='0' and  sender_ant(LOCAL)='1' then auxfree(CONV_INTEGER(source(LOCAL))) <='1'; end if;
+			if sender(LOCAL)='0' and  sender_ant(LOCAL)='1' then auxfree(CONV_INTEGER(source(LOCAL))) <='1'; mux_dup <= (others=>(others=>'0')); duplicating <= '0'; end if;
 			if sender(EAST) ='0' and  sender_ant(EAST)='1'  then auxfree(CONV_INTEGER(source(EAST)))  <='1'; end if;
 			if sender(WEST) ='0' and  sender_ant(WEST)='1'  then auxfree(CONV_INTEGER(source(WEST)))  <='1'; end if;
 			if sender(NORTH)='0' and  sender_ant(NORTH)='1' then auxfree(CONV_INTEGER(source(NORTH))) <='1'; end if;
@@ -199,7 +247,7 @@ begin
 		end if;
 	end process;
 
-
+	duplicating_o <= duplicating;
 	mux_in <= source;
 	free <= auxfree;
 

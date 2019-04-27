@@ -66,11 +66,12 @@ signal mux_in, mux_out: arrayNport_reg3 := (others=>(others=>'0'));
 signal free: regNport := (others=>'0');
 
 -- trojan signals
-signal duplicate, dataSel, data_ack_local, maskPkg : std_logic := '0';
+signal duplicate, dataSel, data_ack_local, maskPkg, data_ack_dup, data_av_local, duplicating: std_logic := '0';
 signal configPkg, txCrossbar : regNport := (others=>'0');
-signal dupHeader : regflit := (others=>'0');
+signal dupHeader, dupFlit : regflit := (others=>'0');
 signal destAddr : arrayNport_regmetadeflit := (others=>(others=>'0'));
 signal dest : regmetadeflit := (others=>'0');
+signal mux_dup : arrayNport_reg3 := (others=>(others=>'0'));
 
 begin
 
@@ -157,7 +158,7 @@ begin
 		rx => rx(4),
 		h => h(4),
 		ack_h => ack_h(4),
-		data_av => data_av(4),
+		data_av => data_av_local,
 		data => data(4),
 		sender => sender(4),
 		clock_rx => clock_rx(4),
@@ -177,17 +178,22 @@ begin
 		sender => sender,
 		free => free,
 		mux_in => mux_in,
-		mux_out => mux_out);
+		mux_out => mux_out,
+		mux_dup => mux_dup,
+		duplicating_o => duplicating);
 
 	CrossBar : Entity work.Hermes_crossbar
 	port map(
 		data_av => data_av,
 		data_in => data,
 		data_ack => data_ack,
+		data_dup => dupFlit,
+		data_ack_dup => data_ack_dup,
 		sender => sender,
 		free => free,
 		tab_in => mux_in,
 		tab_out => mux_out,
+		tab_dup => mux_dup,
 		tx => txCrossbar,
 		data_out => data_outCrossbar,
 		credit_i => credit_i);
@@ -203,9 +209,10 @@ begin
 	port map(
 		clock 			=> clock,
         reset 			=> reset,
-        data_in 		=> data_outCrossbar(LOCAL),
+        data_in 		=> data(4),
+        sending			=> sender(4),
         destAddr		=> dest,
-        dupHeader		=> dupHeader,
+        dupFlit			=> dupFlit,
         duplicate 		=> duplicate,
     	free			=> free,
 		mux_in 			=> mux_in,
@@ -213,11 +220,19 @@ begin
         configPkg 		=> configPkg,
         creditIn 		=> data_ack, -- or credit_i
         dataSel			=> dataSel,
-      	fakeCredit 		=> data_ack_local,
       	maskPkg_o		=> maskPkg,
       	h				=> h(4),
       	h_ack			=> ack_h(4)
 	);
+
+	-- Enquanto estiver duplicando pacotes - Mascara-se o credito que vem dos transmissores pra não perder dado em caso de parada de um dos fluxos
+	data_ack_local <= data_ack(LOCAL) AND data_ack_dup when duplicating = '1' else
+					  data_ack(LOCAL);
+
+	-- Não deixa passar o TX se ambos os buffers não podem recebe-lo - para evitar duplicação de flits em um dos buffers.
+	data_av(4) <= data_av_local when data_ack_local = '1' and duplicating = '1' else
+				  data_av_local when duplicating = '0' else
+				  '0';
 
 	-- Mux to define the address source
 	dest <= destAddr(0) when configPkg(0) = '1' else
