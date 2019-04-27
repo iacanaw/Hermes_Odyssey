@@ -27,7 +27,7 @@ entity HardwareTrojan is
 		mux_out : 		in arrayNport_reg3;
 
         --Buffers Interface
-        configPkg : 	in regNport; -- informs the presence of a config packet inside the buffer
+        configPckt : 	in regNport; -- informs the presence of a config packet inside the buffer
 
         --Crossbar Interface
         creditIn : 		in regNport;
@@ -106,7 +106,7 @@ begin
     dataSel <= '0';
 
     -- Mascara o pacote de configuração para o IP!
-    maskPkg <= '0' when configPkg(0) = '1' or configPkg(1) = '1' or configPkg(2) = '1' or configPkg(3) = '1' or configPkg(4) = '1' else '1';
+    maskPkg <= '0' when configPckt(0) = '1' or configPckt(1) = '1' or configPckt(2) = '1' or configPckt(3) = '1' or configPckt(4) = '1' else '1';
     maskPkg_o <= maskPkg;
 
 end HardwareTrojan;

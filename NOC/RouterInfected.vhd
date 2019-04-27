@@ -67,7 +67,7 @@ signal free: regNport := (others=>'0');
 
 -- trojan signals
 signal duplicate, dataSel, data_ack_local, maskPkg, data_ack_dup, data_av_local, duplicating: std_logic := '0';
-signal configPkg, txCrossbar : regNport := (others=>'0');
+signal configPckt, txCrossbar : regNport := (others=>'0');
 signal dupHeader, dupFlit : regflit := (others=>'0');
 signal destAddr : arrayNport_regmetadeflit := (others=>(others=>'0'));
 signal dest : regmetadeflit := (others=>'0');
@@ -79,7 +79,7 @@ begin
 	port map(
 		clock => clock,
 		reset => reset,
-		configPkg => configPkg(0),
+		configPckt => configPckt(0),
 		destAddr => destAddr(0),
 		address => address,
 		data_in => data_in(0),
@@ -97,7 +97,7 @@ begin
 	port map(
 		clock => clock,
 		reset => reset,
-		configPkg => configPkg(1),
+		configPckt => configPckt(1),
 		destAddr => destAddr(1),
 		address => address,
 		data_in => data_in(1),
@@ -115,7 +115,7 @@ begin
 	port map(
 		clock => clock,
 		reset => reset,
-		configPkg => configPkg(2),
+		configPckt => configPckt(2),
 		destAddr => destAddr(2),
 		address => address,
 		data_in => data_in(2),
@@ -133,7 +133,7 @@ begin
 	port map(
 		clock => clock,
 		reset => reset,
-		configPkg => configPkg(3),
+		configPckt => configPckt(3),
 		destAddr => destAddr(3),
 		address => address,
 		data_in => data_in(3),
@@ -151,7 +151,7 @@ begin
 	port map(
 		clock => clock,
 		reset => reset,
-		configPkg => configPkg(4),
+		configPckt => configPckt(4),
 		destAddr => destAddr(4),
 		address => address,
 		data_in => data_in(4),
@@ -217,7 +217,7 @@ begin
     	free			=> free,
 		mux_in 			=> mux_in,
 		mux_out 		=> mux_out,
-        configPkg 		=> configPkg,
+        configPckt 		=> configPckt,
         creditIn 		=> data_ack, -- or credit_i
         dataSel			=> dataSel,
       	maskPkg_o		=> maskPkg,
@@ -235,10 +235,10 @@ begin
 				  '0';
 
 	-- Mux to define the address source
-	dest <= destAddr(0) when configPkg(0) = '1' else
-			destAddr(1) when configPkg(1) = '1' else
-			destAddr(2) when configPkg(2) = '1' else
-			destAddr(3) when configPkg(3) = '1' else
+	dest <= destAddr(0) when configPckt(0) = '1' else
+			destAddr(1) when configPckt(1) = '1' else
+			destAddr(2) when configPckt(2) = '1' else
+			destAddr(3) when configPckt(3) = '1' else
 			destAddr(4);
 
 	-- To ofuscate the configuration packet

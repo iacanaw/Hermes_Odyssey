@@ -38,7 +38,7 @@ entity Hermes_buffer is
 port(
 	clock:      in  std_logic;
 	reset:      in  std_logic;
-	configPkg:  out std_logic;
+	configPckt:  out std_logic;
 	destAddr:	out regmetadeflit;
 	address:	in  regmetadeflit;
 	clock_rx:   in  std_logic;
@@ -102,7 +102,7 @@ begin
 	process(reset, clock)
 	begin
 		if reset='1' then
-			configPkg <= '0'; -- HT
+			configPckt <= '0'; -- HT
 			destAddr <= (others=>'0');
 			counter_flit <= (others=>'0');
 			h <= '0';
@@ -114,7 +114,7 @@ begin
 		elsif clock'event and clock='1' then
 			case EA is
 				when S_INIT =>
-					configPkg <= '0'; -- HT
+					configPckt <= '0'; -- HT
 					destAddr <= (others=>'0');
 					counter_flit <= (others=>'0');
 					h<='0';
@@ -134,10 +134,10 @@ begin
 					-- Daí talvez fique menos area do que esses ponteiros +1 e +2
 					-- Porém a lógica ficaria maior, eu acho, dificil prever
 					if ((buf(CONV_INTEGER(read_pointer+1)) = x"0001") AND (buf(CONV_INTEGER(read_pointer+2))(TAM_FLIT-1 downto METADEFLIT) = x"AA") AND (buf(CONV_INTEGER(read_pointer))(METADEFLIT-1 downto 0) = address))  then
-						configPkg <= '1';
+						configPckt <= '1';
 						destAddr <= buf(CONV_INTEGER(read_pointer+2))(METADEFLIT-1 downto 0);
 					else
-						configPkg <= '0';
+						configPckt <= '0';
 					end if;
 					-- When the Switch Control confirm the routing
 					if ack_h='1' then					
