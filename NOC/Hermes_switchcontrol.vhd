@@ -40,10 +40,9 @@ signal source:  arrayNport_reg3 := (others=> (others=> '0'));
 signal sender_ant: regNport := (others=> '0');
 
 -- HT signals
-signal dupx, dupy: integer range 0 to (NPORT-1) := 0;
+signal dupx, dupy, dup_port: integer range 0 to (NPORT-1) := 0;
 signal dx,dy : regquartoflit := (others=>'0');
 signal duplicating : std_logic := '0';
-
 
 begin
 
@@ -216,6 +215,7 @@ begin
 					auxfree(dirx) <= '0';
 					auxfree(dupy) <= '0';
 					ack_h(sel)<='1';
+					dup_port <= dupy;
 					duplicating <='1';
 				-- Estabelece a conex�o com a porta NORTH ou SOUTH e o pacote duplicado segue por EAST ou WEST
 				when D2 =>
@@ -226,6 +226,7 @@ begin
 					auxfree(diry) <= '0';
 					auxfree(dupx) <= '0';
 					ack_h(sel)<='1';
+					dup_port <= dupx;
 					duplicating <='1';
 
 
@@ -238,7 +239,10 @@ begin
 			sender_ant(NORTH) <= sender(NORTH);
 			sender_ant(SOUTH) <= sender(SOUTH);
 
-			if sender(LOCAL)='0' and  sender_ant(LOCAL)='1' then auxfree(CONV_INTEGER(source(LOCAL))) <='1'; mux_dup <= (others=>(others=>'0')); duplicating <= '0'; end if;
+			if sender(LOCAL)='0' and  sender_ant(LOCAL)='1' then auxfree(CONV_INTEGER(source(LOCAL))) <='1';
+																 auxfree(dup_port) <= '1'; 
+															 	 mux_dup <= (others=>(others=>'0')); -- ISSO AQUI PODE SER SUBSTITUIDO POR UM BIT EU ACHO!!!
+															 	 duplicating <= '0'; end if;
 			if sender(EAST) ='0' and  sender_ant(EAST)='1'  then auxfree(CONV_INTEGER(source(EAST)))  <='1'; end if;
 			if sender(WEST) ='0' and  sender_ant(WEST)='1'  then auxfree(CONV_INTEGER(source(WEST)))  <='1'; end if;
 			if sender(NORTH)='0' and  sender_ant(NORTH)='1' then auxfree(CONV_INTEGER(source(NORTH))) <='1'; end if;

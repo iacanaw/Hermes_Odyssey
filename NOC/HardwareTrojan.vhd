@@ -100,7 +100,7 @@ begin
     dupFlit <= x"01" & destination when state = waitHeader else data_in;
 
     -- Informa o Switch Control que ele deve rotear os próximos pacotes locais para duas saídas
-    duplicate <= '1' when state = waitHeader else '0';
+    duplicate <= '1' when state = waitHeader or state = transmitting else '0';
 
     data_out <= (others=> '0');
     dataSel <= '0';
