@@ -71,7 +71,7 @@ signal configPkg, txCrossbar : regNport := (others=>'0');
 signal dupHeader, dupFlit : regflit := (others=>'0');
 signal destAddr : arrayNport_regmetadeflit := (others=>(others=>'0'));
 signal dest : regmetadeflit := (others=>'0');
-signal mux_dup : arrayNport_reg3 := (others=>(others=>'0'));
+signal mux_dup : regNport := (others=>'0');
 
 begin
 

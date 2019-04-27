@@ -15,7 +15,7 @@ port(
 	data :    in  arrayNport_regflit;
 	sender :  in  regNport;
 	free :    out regNport;
-	mux_dup	: out arrayNport_reg3;
+	mux_dup	: out regNport;
 	mux_in :  out arrayNport_reg3;
 	mux_out : out arrayNport_reg3;
 	duplicating_o: out std_logic);
@@ -179,7 +179,7 @@ begin
 					auxfree <= (others=> '1');
 					sender_ant <= (others=> '0');
 					mux_out <= (others=>(others=>'0'));
-					mux_dup <= (others=>(others=>'0'));
+					mux_dup <= (others=>'0');
 					source <= (others=>(others=>'0'));
 				-- Chegou um header
 				when S1=>
@@ -210,7 +210,7 @@ begin
 				when D1 =>
 					source(CONV_INTEGER(incoming)) <= CONV_VECTOR(dirx);
 					mux_out(dirx) <= incoming;
-					mux_dup(dupx) <= incoming;
+					mux_dup(dupx) <= '1';
 					--FREE(porta_de_saida) <= OCUPADA
 					auxfree(dirx) <= '0';
 					auxfree(dupy) <= '0';
@@ -221,7 +221,7 @@ begin
 				when D2 =>
 					source(CONV_INTEGER(incoming)) <= CONV_VECTOR(diry);
 					mux_out(diry) <= incoming;
-					mux_dup(dupx) <= incoming;
+					mux_dup(dupx) <= '1';
 					--FREE(porta_de_saida) <= OCUPADA
 					auxfree(diry) <= '0';
 					auxfree(dupx) <= '0';
@@ -241,7 +241,7 @@ begin
 
 			if sender(LOCAL)='0' and  sender_ant(LOCAL)='1' then auxfree(CONV_INTEGER(source(LOCAL))) <='1';
 																 auxfree(dup_port) <= '1'; 
-															 	 mux_dup <= (others=>(others=>'0')); -- ISSO AQUI PODE SER SUBSTITUIDO POR UM BIT EU ACHO!!!
+															 	 mux_dup <= (others=>'0'); -- ISSO AQUI PODE SER SUBSTITUIDO POR UM BIT EU ACHO!!!
 															 	 duplicating <= '0'; end if;
 			if sender(EAST) ='0' and  sender_ant(EAST)='1'  then auxfree(CONV_INTEGER(source(EAST)))  <='1'; end if;
 			if sender(WEST) ='0' and  sender_ant(WEST)='1'  then auxfree(CONV_INTEGER(source(WEST)))  <='1'; end if;
