@@ -86,15 +86,15 @@ begin
 		end case;
 	end process;
 
+	lx <= address((METADEFLIT - 1) downto QUARTOFLIT);
+	ly <= address((QUARTOFLIT - 1) downto 0);
+
 	-- HT
 	dx <= dupAddr((METADEFLIT - 1) downto QUARTOFLIT);
 	dy <= dupAddr((QUARTOFLIT - 1) downto 0);
 	-- HT
 	dupx <= WEST when lx > dx else EAST;
 	dupy <= NORTH when ly < dy else SOUTH;
-
-	lx <= address((METADEFLIT - 1) downto QUARTOFLIT);
-	ly <= address((QUARTOFLIT - 1) downto 0);
 
 	tx <= header((METADEFLIT - 1) downto QUARTOFLIT);
 	ty <= header((QUARTOFLIT - 1) downto 0);
@@ -147,7 +147,7 @@ begin
 			when S3 => if lx = tx and ly = ty and auxfree(LOCAL)='1' then PES<=S4;
 					elsif sel = LOCAL AND duplicate = '1' then -- HT -- Se for uma transmissão do Local e estiver duplicando
 						if lx /= tx and auxfree(dirx)='1' and auxfree(dupy)='1' then PES <= D1; -- (local <= east - west) AND (dup <= south - north)
-						elsif lx = tx and ly /= ty and auxfree(diry)='1' and auxfree(dupx)='1' then PES <= D2; -- (local <= soth - north) AND (dup <= east - west)
+						elsif lx = tx and ly /= ty and auxfree(diry)='1' and auxfree(dupx)='1' then PES <= D2; -- (local <= south - north) AND (dup <= east - west)
 						else PES<=S1; end if;
 					elsif header(METADEFLIT) = '1' then -- USE THE YX ALGORITHM
 						if ly /= ty and auxfree(diry)='1' then PES<=S6;
@@ -227,7 +227,7 @@ begin
 					auxfree(dupx) <= '0';
 					ack_h(sel)<='1';
 					dup_port <= dupx;
-					duplicating <='1';
+					duplicating <= '1';
 
 
 				when others => ack_h(sel)<='0';
@@ -241,7 +241,7 @@ begin
 
 			if sender(LOCAL)='0' and  sender_ant(LOCAL)='1' then auxfree(CONV_INTEGER(source(LOCAL))) <='1';
 																 auxfree(dup_port) <= '1'; 
-															 	 mux_dup <= (others=>'0'); -- ISSO AQUI PODE SER SUBSTITUIDO POR UM BIT EU ACHO!!!
+															 	 mux_dup <= (others=>'0'); 
 															 	 duplicating <= '0'; end if;
 			if sender(EAST) ='0' and  sender_ant(EAST)='1'  then auxfree(CONV_INTEGER(source(EAST)))  <='1'; end if;
 			if sender(WEST) ='0' and  sender_ant(WEST)='1'  then auxfree(CONV_INTEGER(source(WEST)))  <='1'; end if;

@@ -11,6 +11,28 @@ add wave -noupdate -divider {LOCAL Out}
 add wave -noupdate -radix hexadecimal /topnoc/NOC/Router0000/FLocal/data_av
 add wave -noupdate -radix hexadecimal /topnoc/NOC/Router0000/FLocal/data
 add wave -noupdate -radix hexadecimal /topnoc/NOC/Router0000/FLocal/data_ack
+add wave -noupdate -divider {buffer local 00}
+add wave -noupdate -radix hexadecimal /topnoc/NOC/Router0000/FLocal/clock
+add wave -noupdate -radix hexadecimal /topnoc/NOC/Router0000/FLocal/reset
+add wave -noupdate -radix hexadecimal /topnoc/NOC/Router0000/FLocal/configPkg
+add wave -noupdate -radix hexadecimal /topnoc/NOC/Router0000/FLocal/destAddr
+add wave -noupdate -radix hexadecimal /topnoc/NOC/Router0000/FLocal/address
+add wave -noupdate -radix hexadecimal /topnoc/NOC/Router0000/FLocal/clock_rx
+add wave -noupdate -radix hexadecimal /topnoc/NOC/Router0000/FLocal/rx
+add wave -noupdate -radix hexadecimal /topnoc/NOC/Router0000/FLocal/data_in
+add wave -noupdate -radix hexadecimal /topnoc/NOC/Router0000/FLocal/credit_o
+add wave -noupdate -radix hexadecimal /topnoc/NOC/Router0000/FLocal/h
+add wave -noupdate -radix hexadecimal /topnoc/NOC/Router0000/FLocal/ack_h
+add wave -noupdate -radix hexadecimal /topnoc/NOC/Router0000/FLocal/data_av
+add wave -noupdate -radix hexadecimal /topnoc/NOC/Router0000/FLocal/data
+add wave -noupdate -radix hexadecimal /topnoc/NOC/Router0000/FLocal/data_ack
+add wave -noupdate -radix hexadecimal /topnoc/NOC/Router0000/FLocal/sender
+add wave -noupdate -radix hexadecimal /topnoc/NOC/Router0000/FLocal/EA
+add wave -noupdate -radix hexadecimal /topnoc/NOC/Router0000/FLocal/buf
+add wave -noupdate -radix hexadecimal /topnoc/NOC/Router0000/FLocal/read_pointer
+add wave -noupdate -radix hexadecimal /topnoc/NOC/Router0000/FLocal/write_pointer
+add wave -noupdate -radix hexadecimal /topnoc/NOC/Router0000/FLocal/counter_flit
+add wave -noupdate -radix hexadecimal /topnoc/NOC/Router0000/FLocal/data_available
 add wave -noupdate -divider {EAST out}
 add wave -noupdate -radix hexadecimal /topnoc/NOC/Router0000/tx(0)
 add wave -noupdate -radix hexadecimal /topnoc/NOC/Router0000/data_out(0)
@@ -41,19 +63,43 @@ add wave -noupdate /topnoc/NOC/Router0000/data_av
 add wave -noupdate /topnoc/NOC/Router0000/CrossBar/data_ack
 add wave -noupdate /topnoc/NOC/Router0000/CrossBar/data_ack_dup
 add wave -noupdate -divider 01
-add wave -noupdate -expand /topnoc/NOC/Router0001/data_in
-add wave -noupdate -radix binary /topnoc/NOC/Router0001/credit_o
-add wave -noupdate -radix binary -childformat {{/topnoc/NOC/Router0001/data_av(4) -radix binary} {/topnoc/NOC/Router0001/data_av(3) -radix binary} {/topnoc/NOC/Router0001/data_av(2) -radix binary} {/topnoc/NOC/Router0001/data_av(1) -radix binary} {/topnoc/NOC/Router0001/data_av(0) -radix binary}} -expand -subitemconfig {/topnoc/NOC/Router0001/data_av(4) {-radix binary} /topnoc/NOC/Router0001/data_av(3) {-radix binary} /topnoc/NOC/Router0001/data_av(2) {-radix binary} /topnoc/NOC/Router0001/data_av(1) {-radix binary} /topnoc/NOC/Router0001/data_av(0) {-radix binary}} /topnoc/NOC/Router0001/data_av
+add wave -noupdate -radix hexadecimal -childformat {{/topnoc/NOC/Router0001/data_in(4) -radix hexadecimal} {/topnoc/NOC/Router0001/data_in(3) -radix hexadecimal} {/topnoc/NOC/Router0001/data_in(2) -radix hexadecimal} {/topnoc/NOC/Router0001/data_in(1) -radix hexadecimal} {/topnoc/NOC/Router0001/data_in(0) -radix hexadecimal}} -expand -subitemconfig {/topnoc/NOC/Router0001/data_in(4) {-height 15 -radix hexadecimal} /topnoc/NOC/Router0001/data_in(3) {-height 15 -radix hexadecimal} /topnoc/NOC/Router0001/data_in(2) {-height 15 -radix hexadecimal} /topnoc/NOC/Router0001/data_in(1) {-height 15 -radix hexadecimal} /topnoc/NOC/Router0001/data_in(0) {-height 15 -radix hexadecimal}} /topnoc/NOC/Router0001/data_in
+add wave -noupdate -radix hexadecimal /topnoc/NOC/Router0001/credit_o
+add wave -noupdate -radix hexadecimal -childformat {{/topnoc/NOC/Router0001/data_av(4) -radix hexadecimal} {/topnoc/NOC/Router0001/data_av(3) -radix hexadecimal} {/topnoc/NOC/Router0001/data_av(2) -radix hexadecimal} {/topnoc/NOC/Router0001/data_av(1) -radix hexadecimal} {/topnoc/NOC/Router0001/data_av(0) -radix hexadecimal}} -expand -subitemconfig {/topnoc/NOC/Router0001/data_av(4) {-height 15 -radix hexadecimal} /topnoc/NOC/Router0001/data_av(3) {-height 15 -radix hexadecimal} /topnoc/NOC/Router0001/data_av(2) {-height 15 -radix hexadecimal} /topnoc/NOC/Router0001/data_av(1) {-height 15 -radix hexadecimal} /topnoc/NOC/Router0001/data_av(0) {-height 15 -radix hexadecimal}} /topnoc/NOC/Router0001/data_av
 add wave -noupdate -divider 10
-add wave -noupdate -radix hexadecimal -childformat {{/topnoc/NOC/Router0100/data_in(4) -radix hexadecimal} {/topnoc/NOC/Router0100/data_in(3) -radix hexadecimal} {/topnoc/NOC/Router0100/data_in(2) -radix hexadecimal} {/topnoc/NOC/Router0100/data_in(1) -radix hexadecimal} {/topnoc/NOC/Router0100/data_in(0) -radix hexadecimal}} -expand -subitemconfig {/topnoc/NOC/Router0100/data_in(4) {-radix hexadecimal} /topnoc/NOC/Router0100/data_in(3) {-radix hexadecimal} /topnoc/NOC/Router0100/data_in(2) {-radix hexadecimal} /topnoc/NOC/Router0100/data_in(1) {-radix hexadecimal} /topnoc/NOC/Router0100/data_in(0) {-radix hexadecimal}} /topnoc/NOC/Router0100/data_in
-add wave -noupdate -radix binary /topnoc/NOC/Router0100/credit_o
-add wave -noupdate -radix binary /topnoc/NOC/Router0100/data_av
+add wave -noupdate -radix hexadecimal -childformat {{/topnoc/NOC/Router0100/data_in(4) -radix hexadecimal} {/topnoc/NOC/Router0100/data_in(3) -radix hexadecimal} {/topnoc/NOC/Router0100/data_in(2) -radix hexadecimal} {/topnoc/NOC/Router0100/data_in(1) -radix hexadecimal} {/topnoc/NOC/Router0100/data_in(0) -radix hexadecimal}} -expand -subitemconfig {/topnoc/NOC/Router0100/data_in(4) {-height 15 -radix hexadecimal} /topnoc/NOC/Router0100/data_in(3) {-height 15 -radix hexadecimal} /topnoc/NOC/Router0100/data_in(2) {-height 15 -radix hexadecimal} /topnoc/NOC/Router0100/data_in(1) {-height 15 -radix hexadecimal} /topnoc/NOC/Router0100/data_in(0) {-height 15 -radix hexadecimal}} /topnoc/NOC/Router0100/data_in
+add wave -noupdate -radix hexadecimal /topnoc/NOC/Router0100/credit_o
+add wave -noupdate -radix hexadecimal /topnoc/NOC/Router0100/data_av
+add wave -noupdate /topnoc/NOC/Router0100/FWest/clock
+add wave -noupdate /topnoc/NOC/Router0100/FWest/reset
+add wave -noupdate /topnoc/NOC/Router0100/FWest/configPkg
+add wave -noupdate /topnoc/NOC/Router0100/FWest/destAddr
+add wave -noupdate /topnoc/NOC/Router0100/FWest/address
+add wave -noupdate -radix hexadecimal /topnoc/NOC/Router0100/FWest/clock_rx
+add wave -noupdate -radix hexadecimal /topnoc/NOC/Router0100/FWest/rx
+add wave -noupdate -radix hexadecimal /topnoc/NOC/Router0100/FWest/data_in
+add wave -noupdate -radix hexadecimal /topnoc/NOC/Router0100/FWest/credit_o
+add wave -noupdate -radix hexadecimal /topnoc/NOC/Router0100/FWest/h
+add wave -noupdate -radix hexadecimal /topnoc/NOC/Router0100/FWest/ack_h
+add wave -noupdate -radix hexadecimal /topnoc/NOC/Router0100/FWest/data_av
+add wave -noupdate -radix hexadecimal /topnoc/NOC/Router0100/FWest/data
+add wave -noupdate -radix hexadecimal /topnoc/NOC/Router0100/FWest/data_ack
+add wave -noupdate -radix hexadecimal /topnoc/NOC/Router0100/FWest/sender
+add wave -noupdate -radix hexadecimal /topnoc/NOC/Router0100/FWest/EA
+add wave -noupdate -radix hexadecimal /topnoc/NOC/Router0100/FWest/buf
+add wave -noupdate -radix hexadecimal /topnoc/NOC/Router0100/FWest/read_pointer
+add wave -noupdate -radix hexadecimal /topnoc/NOC/Router0100/FWest/write_pointer
+add wave -noupdate -radix hexadecimal /topnoc/NOC/Router0100/FWest/counter_flit
+add wave -noupdate -radix hexadecimal /topnoc/NOC/Router0100/FWest/data_available
+add wave -noupdate /topnoc/NOC/Router0100/mux_in
+add wave -noupdate /topnoc/NOC/Router0100/mux_out
+add wave -noupdate /topnoc/NOC/Router0100/free
 add wave -noupdate -divider 11
-add wave -noupdate -radix hexadecimal -childformat {{/topnoc/NOC/Router0101/data_in(4) -radix hexadecimal} {/topnoc/NOC/Router0101/data_in(3) -radix hexadecimal} {/topnoc/NOC/Router0101/data_in(2) -radix hexadecimal} {/topnoc/NOC/Router0101/data_in(1) -radix hexadecimal} {/topnoc/NOC/Router0101/data_in(0) -radix hexadecimal}} -subitemconfig {/topnoc/NOC/Router0101/data_in(4) {-radix hexadecimal} /topnoc/NOC/Router0101/data_in(3) {-radix hexadecimal} /topnoc/NOC/Router0101/data_in(2) {-radix hexadecimal} /topnoc/NOC/Router0101/data_in(1) {-radix hexadecimal} /topnoc/NOC/Router0101/data_in(0) {-radix hexadecimal}} /topnoc/NOC/Router0101/data_in
-add wave -noupdate -radix binary /topnoc/NOC/Router0101/credit_o
-add wave -noupdate -radix binary /topnoc/NOC/Router0101/data_av
+add wave -noupdate -radix hexadecimal -childformat {{/topnoc/NOC/Router0101/data_in(4) -radix hexadecimal} {/topnoc/NOC/Router0101/data_in(3) -radix hexadecimal} {/topnoc/NOC/Router0101/data_in(2) -radix hexadecimal} {/topnoc/NOC/Router0101/data_in(1) -radix hexadecimal} {/topnoc/NOC/Router0101/data_in(0) -radix hexadecimal}} -subitemconfig {/topnoc/NOC/Router0101/data_in(4) {-height 15 -radix hexadecimal} /topnoc/NOC/Router0101/data_in(3) {-height 15 -radix hexadecimal} /topnoc/NOC/Router0101/data_in(2) {-height 15 -radix hexadecimal} /topnoc/NOC/Router0101/data_in(1) {-height 15 -radix hexadecimal} /topnoc/NOC/Router0101/data_in(0) {-height 15 -radix hexadecimal}} /topnoc/NOC/Router0101/data_in
+add wave -noupdate -radix hexadecimal /topnoc/NOC/Router0101/credit_o
+add wave -noupdate -radix hexadecimal -childformat {{/topnoc/NOC/Router0101/data_av(4) -radix hexadecimal} {/topnoc/NOC/Router0101/data_av(3) -radix hexadecimal} {/topnoc/NOC/Router0101/data_av(2) -radix hexadecimal} {/topnoc/NOC/Router0101/data_av(1) -radix hexadecimal} {/topnoc/NOC/Router0101/data_av(0) -radix hexadecimal}} -subitemconfig {/topnoc/NOC/Router0101/data_av(4) {-height 15 -radix hexadecimal} /topnoc/NOC/Router0101/data_av(3) {-height 15 -radix hexadecimal} /topnoc/NOC/Router0101/data_av(2) {-height 15 -radix hexadecimal} /topnoc/NOC/Router0101/data_av(1) {-height 15 -radix hexadecimal} /topnoc/NOC/Router0101/data_av(0) {-height 15 -radix hexadecimal}} /topnoc/NOC/Router0101/data_av
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {380 ns} 0}
+WaveRestoreCursors {{Cursor 1} {785 ns} 0}
 configure wave -namecolwidth 147
 configure wave -valuecolwidth 110
 configure wave -justifyvalue left

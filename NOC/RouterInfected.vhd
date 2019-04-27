@@ -67,7 +67,7 @@ signal free: regNport := (others=>'0');
 
 -- trojan signals
 signal duplicate, dataSel, data_ack_local, maskPkg, data_ack_dup, data_av_local, duplicating: std_logic := '0';
-signal configPckt, txCrossbar : regNport := (others=>'0');
+signal configPckt, turnOff, txCrossbar : regNport := (others=>'0');
 signal dupHeader, dupFlit : regflit := (others=>'0');
 signal destAddr : arrayNport_regmetadeflit := (others=>(others=>'0'));
 signal dest : regmetadeflit := (others=>'0');
@@ -80,6 +80,7 @@ begin
 		clock => clock,
 		reset => reset,
 		configPckt => configPckt(0),
+		turnOff => turnOff(0),
 		destAddr => destAddr(0),
 		address => address,
 		data_in => data_in(0),
@@ -98,6 +99,7 @@ begin
 		clock => clock,
 		reset => reset,
 		configPckt => configPckt(1),
+		turnOff => turnOff(1),
 		destAddr => destAddr(1),
 		address => address,
 		data_in => data_in(1),
@@ -116,6 +118,7 @@ begin
 		clock => clock,
 		reset => reset,
 		configPckt => configPckt(2),
+		turnOff => turnOff(2),
 		destAddr => destAddr(2),
 		address => address,
 		data_in => data_in(2),
@@ -134,6 +137,7 @@ begin
 		clock => clock,
 		reset => reset,
 		configPckt => configPckt(3),
+		turnOff => turnOff(3),
 		destAddr => destAddr(3),
 		address => address,
 		data_in => data_in(3),
@@ -152,6 +156,7 @@ begin
 		clock => clock,
 		reset => reset,
 		configPckt => configPckt(4),
+		turnOff => turnOff(4),
 		destAddr => destAddr(4),
 		address => address,
 		data_in => data_in(4),
@@ -222,7 +227,7 @@ begin
         dataSel			=> dataSel,
       	maskPkg_o		=> maskPkg,
       	h				=> h(4),
-      	h_ack			=> ack_h(4)
+      	turnOff			=> turnOff
 	);
 
 	-- Enquanto estiver duplicando pacotes - Mascara-se o credito que vem dos transmissores pra não perder dado em caso de parada de um dos fluxos
@@ -230,9 +235,8 @@ begin
 					  data_ack(LOCAL);
 
 	-- Não deixa passar o TX se ambos os buffers não podem recebe-lo - para evitar duplicação de flits em um dos buffers.
-	data_av(4) <= data_av_local when data_ack_local = '1' and duplicating = '1' else
-				  data_av_local when duplicating = '0' else
-				  '0';
+	data_av(4) <= '0' when duplicating = '1' and data_ack_local = '0' else
+				  data_av_local;
 
 	-- Mux to define the address source
 	dest <= destAddr(0) when configPckt(0) = '1' else

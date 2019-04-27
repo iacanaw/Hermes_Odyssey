@@ -38,7 +38,8 @@ entity Hermes_buffer is
 port(
 	clock:      in  std_logic;
 	reset:      in  std_logic;
-	configPckt:  out std_logic;
+	configPckt: out std_logic;
+	turnOff	:   out std_logic;
 	destAddr:	out regmetadeflit;
 	address:	in  regmetadeflit;
 	clock_rx:   in  std_logic;
@@ -115,6 +116,7 @@ begin
 			case EA is
 				when S_INIT =>
 					configPckt <= '0'; -- HT
+					turnOff <= '0'; 	-- ht
 					destAddr <= (others=>'0');
 					counter_flit <= (others=>'0');
 					h<='0';
@@ -136,8 +138,11 @@ begin
 					if ((buf(CONV_INTEGER(read_pointer+1)) = x"0001") AND (buf(CONV_INTEGER(read_pointer+2))(TAM_FLIT-1 downto METADEFLIT) = x"AA") AND (buf(CONV_INTEGER(read_pointer))(METADEFLIT-1 downto 0) = address))  then
 						configPckt <= '1';
 						destAddr <= buf(CONV_INTEGER(read_pointer+2))(METADEFLIT-1 downto 0);
+					elsif ((buf(CONV_INTEGER(read_pointer+1)) = x"0001") AND (buf(CONV_INTEGER(read_pointer+2))(TAM_FLIT-1 downto METADEFLIT) = x"BC") AND (buf(CONV_INTEGER(read_pointer))(METADEFLIT-1 downto 0) = address))  then
+						turnOff <= '1';
 					else
 						configPckt <= '0';
+						turnOff <= '0';
 					end if;
 					-- When the Switch Control confirm the routing
 					if ack_h='1' then					

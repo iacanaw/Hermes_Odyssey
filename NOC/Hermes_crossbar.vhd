@@ -40,7 +40,7 @@ begin
 	data_ack_dup <= credit_i(EAST) when tab_dup(EAST)='1' and free(EAST)='0' else
 	 				credit_i(WEST) when tab_dup(WEST)='1' and free(WEST)='0' else
 	 				credit_i(NORTH) when tab_dup(NORTH)='1' and free(NORTH)='0' else
-	 				credit_i(SOUTH) when tab_dup(SOUTH)='1' and free(NORTH)='0' else
+	 				credit_i(SOUTH) when tab_dup(SOUTH)='1' and free(SOUTH)='0' else
 	 				'0';
 
 ----------------------------------------------------------------------------------
