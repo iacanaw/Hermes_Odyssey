@@ -104,6 +104,7 @@ begin
 	begin
 		if reset='1' then
 			configPckt <= '0'; -- HT
+			turnOff <= '0';
 			destAddr <= (others=>'0');
 			counter_flit <= (others=>'0');
 			h <= '0';

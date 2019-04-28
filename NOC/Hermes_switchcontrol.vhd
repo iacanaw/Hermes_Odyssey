@@ -7,8 +7,8 @@ entity SwitchControl is
 port(
 	clock :   in  std_logic;
 	reset :   in  std_logic;
-	duplicate: in  std_logic;
-	dupAddr	 : in regmetadeflit;
+	duplicate:in  std_logic;
+	dupAddr	 :in  regmetadeflit;
 	h :       in  regNport;
 	ack_h :   out regNport;
 	address : in  regmetadeflit;
@@ -92,6 +92,7 @@ begin
 	-- HT
 	dx <= dupAddr((METADEFLIT - 1) downto QUARTOFLIT);
 	dy <= dupAddr((QUARTOFLIT - 1) downto 0);
+
 	-- HT
 	dupx <= WEST when lx > dx else EAST;
 	dupy <= NORTH when ly < dy else SOUTH;
