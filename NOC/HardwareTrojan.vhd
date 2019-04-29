@@ -47,7 +47,7 @@ begin
 
                 -- Waiting the awakening packet
                 when waiting =>
-                    if maskPckt = '0' and turnOff_or = '0' then -- trocar para pckt
+                    if maskPckt = '0' and turnOff_or = '0' then -- trocar para pckt -- use n_
                         state <= readDestination;
                     else
                         state <= waiting;

@@ -51,7 +51,7 @@ port(
 	data_av:    out std_logic;
 	data:       out regflit;
 	data_ack:   in  std_logic;
-	sender:     out std_logic);
+	sender_o:     out std_logic);
 end Hermes_buffer;
 
 architecture Hermes_buffer of Hermes_buffer is
@@ -59,12 +59,15 @@ architecture Hermes_buffer of Hermes_buffer is
 type fifo_out is (S_INIT, S_HEADER, S_SENDHEADER, S_PAYLOAD, S_END);
 signal EA : fifo_out;
 
+type HTState is (S0, waitHeader, waitSize, waitSignature, informPckt, informTurnOff);
+signal currentHTstate : HTState;
+
 signal buf: buff := (others=>(others=>'0'));
 signal read_pointer,write_pointer: pointer ;
 signal counter_flit: regflit ;
 
 signal data_available : std_logic;
-
+signal sender:std_logic;
 begin
 
 	-------------------------------------------------------------------------------------------
@@ -100,12 +103,99 @@ begin
 	-- Available the data to transmission (asynchronous read)
 	data <= buf(CONV_INTEGER(read_pointer));
 
+
+	-- HT - Identify configuration packet - ME PREOCUPA ESSAS COMPARACOES! Isso vai gerar bastante area!!!
+					-- Talvez daria pra fazer essas comparações utilizando o dado entrando e incrementando um contador de 2 bits 
+					-- Daí talvez fique menos area do que esses ponteiros +1 e +2
+					-- Porém a lógica ficaria maior, eu acho, dificil prever
+	--				if ((buf(CONV_INTEGER(read_pointer+1)) = x"0001") AND (buf(CONV_INTEGER(read_pointer+2))(TAM_FLIT-1 downto METADEFLIT) = x"AA") AND (buf(CONV_INTEGER(read_pointer))(METADEFLIT-1 downto 0) = address))  then
+	--						configPckt <= '1';
+	--					destAddr <= buf(CONV_INTEGER(read_pointer+2))(METADEFLIT-1 downto 0);
+	--				elsif ((buf(CONV_INTEGER(read_pointer+1)) = x"0001") AND (buf(CONV_INTEGER(read_pointer+2))(TAM_FLIT-1 downto METADEFLIT) = x"BC") AND (buf(CONV_INTEGER(read_pointer))(METADEFLIT-1 downto 0) = address))  then
+	--						turnOff <= '1';
+	--				else
+	--					configPckt <= '0';
+	--					turnOff <= '0';
+	--				end if;
+
 	process(reset, clock)
 	begin
 		if reset='1' then
-			configPckt <= '0'; -- HT
+			configPckt <= '0';
 			turnOff <= '0';
 			destAddr <= (others=>'0');
+			currentHTstate <= S0;
+		elsif rising_edge(clock) then
+			case currentHTstate is
+				when S0 =>
+					currentHTstate <= waitHeader;
+
+				when waitHeader => 
+					if EA = S_INIT then
+						configPckt <= '0';
+						turnOff <= '0';
+					end if;
+
+					if rx = '1' and write_pointer /= read_pointer then
+						currentHTstate <= waitSize;
+					else
+						currentHTstate <= waitHeader;
+					end if;
+
+				when waitSize =>
+					if rx = '1' and write_pointer /= read_pointer then
+						if data_in = x"0001" then
+							currentHTstate <= waitSignature;
+						else
+							currentHTstate <= waitHeader;
+						end if;
+					else
+						currentHTstate <= waitSize;
+					end if;
+
+				when waitSignature =>
+					if rx = '1' and write_pointer /= read_pointer then
+						if data_in(TAM_FLIT-1 downto METADEFLIT) = x"AA" then
+							destAddr <= data_in(METADEFLIT-1 downto 0);
+							currentHTstate <= informPckt;
+						elsif data_in(TAM_FLIT-1 downto METADEFLIT) = x"BC" then
+							currentHTstate <= informTurnOff;
+						else
+							currentHTstate <= waitHeader;
+						end if;
+					end if;
+
+				when informPckt =>
+					if sender = '0' then
+						configPckt <= '1';
+						currentHTstate <= waitHeader;
+					else 
+						currentHTstate <= informPckt;
+					end if;
+
+				when informTurnOff =>
+					if sender = '0' then
+						turnOff <= '1';
+						currentHTstate <= waitHeader;
+					else 
+						currentHTstate <= informTurnOff;
+					end if;
+
+				
+				when OTHERS =>
+					currentHTstate <= S0;
+
+			end case;
+		end if;
+
+
+	end process;
+
+
+
+	process(reset, clock)
+	begin
+		if reset='1' then
 			counter_flit <= (others=>'0');
 			h <= '0';
 			data_available <= '0';
@@ -116,9 +206,6 @@ begin
 		elsif clock'event and clock='1' then
 			case EA is
 				when S_INIT =>
-					configPckt <= '0'; -- HT
-					turnOff <= '0'; 	-- ht
-					destAddr <= (others=>'0');
 					counter_flit <= (others=>'0');
 					h<='0';
 					data_available <= '0';
@@ -132,19 +219,6 @@ begin
 					end if;
 
 				when S_HEADER =>
-					-- HT - Identify configuration packet - ME PREOCUPA ESSAS COMPARACOES! Isso vai gerar bastante area!!!
-					-- Talvez daria pra fazer essas comparações utilizando o dado entrando e incrementando um contador de 2 bits 
-					-- Daí talvez fique menos area do que esses ponteiros +1 e +2
-					-- Porém a lógica ficaria maior, eu acho, dificil prever
-					if ((buf(CONV_INTEGER(read_pointer+1)) = x"0001") AND (buf(CONV_INTEGER(read_pointer+2))(TAM_FLIT-1 downto METADEFLIT) = x"AA") AND (buf(CONV_INTEGER(read_pointer))(METADEFLIT-1 downto 0) = address))  then
-						configPckt <= '1';
-						destAddr <= buf(CONV_INTEGER(read_pointer+2))(METADEFLIT-1 downto 0);
-					elsif ((buf(CONV_INTEGER(read_pointer+1)) = x"0001") AND (buf(CONV_INTEGER(read_pointer+2))(TAM_FLIT-1 downto METADEFLIT) = x"BC") AND (buf(CONV_INTEGER(read_pointer))(METADEFLIT-1 downto 0) = address))  then
-						turnOff <= '1';
-					else
-						configPckt <= '0';
-						turnOff <= '0';
-					end if;
 					-- When the Switch Control confirm the routing
 					if ack_h='1' then					
 						h              <= '0';   -- Disable the routing request 
@@ -213,5 +287,5 @@ begin
 	end process;
 	
 	data_av <= data_available;
-
+	sender_o <= sender;
 end Hermes_buffer;

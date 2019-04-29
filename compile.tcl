@@ -17,6 +17,7 @@ set sourceFiles {
     NOC/NOC.vhd
     Simulation/Text_Package.vhd
     Simulation/DataManager.vhd
+    Simulation/FlowManager.vhd
     Simulation/topNoC.vhd
 
 

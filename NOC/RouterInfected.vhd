@@ -89,7 +89,7 @@ begin
 		ack_h => ack_h(0),
 		data_av => data_av(0),
 		data => data(0),
-		sender => sender(0),
+		sender_o => sender(0),
 		clock_rx => clock_rx(0),
 		data_ack => data_ack(0),
 		credit_o => credit_o(0));
@@ -108,7 +108,7 @@ begin
 		ack_h => ack_h(1),
 		data_av => data_av(1),
 		data => data(1),
-		sender => sender(1),
+		sender_o => sender(1),
 		clock_rx => clock_rx(1),
 		data_ack => data_ack(1),
 		credit_o => credit_o(1));
@@ -127,7 +127,7 @@ begin
 		ack_h => ack_h(2),
 		data_av => data_av(2),
 		data => data(2),
-		sender => sender(2),
+		sender_o => sender(2),
 		clock_rx => clock_rx(2),
 		data_ack => data_ack(2),
 		credit_o => credit_o(2));
@@ -146,7 +146,7 @@ begin
 		ack_h => ack_h(3),
 		data_av => data_av(3),
 		data => data(3),
-		sender => sender(3),
+		sender_o => sender(3),
 		clock_rx => clock_rx(3),
 		data_ack => data_ack(3),
 		credit_o => credit_o(3));
@@ -165,7 +165,7 @@ begin
 		ack_h => ack_h(4),
 		data_av => data_av_local,
 		data => data(4),
-		sender => sender(4),
+		sender_o => sender(4),
 		clock_rx => clock_rx(4),
 		data_ack => data_ack_local,
 		credit_o => credit_o(4));
