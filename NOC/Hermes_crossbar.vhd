@@ -66,10 +66,10 @@ begin
 ----------------------------------------------------------------------------------
 -- PORTA EAST
 ----------------------------------------------------------------------------------
-	tx(EAST) <= data_av(WEST) when tab_out(EAST)="001" and free(EAST)='0' else
+	tx(EAST) <= data_av(LOCAL) when (tab_out(EAST)="100" and free(EAST)='0') or (tab_dup(EAST)='1' and free(EAST) = '0') else 
+			data_av(WEST) when tab_out(EAST)="001" and free(EAST)='0' else
 			data_av(NORTH)  when tab_out(EAST)="010" and free(EAST)='0' else
 			data_av(SOUTH) when tab_out(EAST)="011" and free(EAST)='0' else
-			data_av(LOCAL) when (tab_out(EAST)="100" and free(EAST)='0') or (tab_dup(EAST)='1' and free(EAST) = '0') else
 			'0';
 	data_out(EAST) <= data_dup when tab_dup(EAST)='1' and free(EAST)='0' else
 			data_in(WEST) when tab_out(EAST)="001" and free(EAST)='0' else
@@ -85,10 +85,10 @@ begin
 ----------------------------------------------------------------------------------
 -- PORTA WEST
 ----------------------------------------------------------------------------------
-	tx(WEST) <= data_av(EAST) when tab_out(WEST)="000" and free(WEST)='0' else
+	tx(WEST) <= data_av(LOCAL) when (tab_out(WEST)="100" and free(WEST)='0') or (tab_dup(WEST)='1' and free(WEST) = '0') else 
+			data_av(EAST) when tab_out(WEST)="000" and free(WEST)='0' else
 			data_av(NORTH)  when tab_out(WEST)="010" and free(WEST)='0' else
 			data_av(SOUTH) when tab_out(WEST)="011" and free(WEST)='0' else
-			data_av(LOCAL) when (tab_out(WEST)="100" and free(WEST)='0') or (tab_dup(WEST)='1' and free(WEST) = '0') else
 			'0';
 
 	data_out(WEST) <= data_dup when tab_dup(WEST)='1' and free(WEST)='0' else
@@ -106,10 +106,10 @@ begin
 ----------------------------------------------------------------------------------
 -- PORTA NORTH
 ----------------------------------------------------------------------------------
-	tx(NORTH) <= data_av(EAST) when tab_out(NORTH)="000" and free(NORTH)='0' else
+	tx(NORTH) <= data_av(LOCAL) when (tab_out(NORTH)="100" and free(NORTH)='0') or (tab_dup(NORTH)='1' and free(NORTH) = '0') else
+			data_av(EAST) when tab_out(NORTH)="000" and free(NORTH)='0' else
 			data_av(WEST)  when tab_out(NORTH)="001" and free(NORTH)='0' else
 			data_av(SOUTH) when tab_out(NORTH)="011" and free(NORTH)='0' else
-			data_av(LOCAL) when (tab_out(NORTH)="100" and free(NORTH)='0') or (tab_dup(NORTH)='1' and free(NORTH) = '0') else
 			'0';
 
 	data_out(NORTH) <= data_dup when tab_dup(NORTH)='1' and free(NORTH)='0' else
@@ -127,10 +127,10 @@ begin
 ----------------------------------------------------------------------------------
 -- PORTA SOUTH
 ----------------------------------------------------------------------------------
-	tx(SOUTH) <= data_av(EAST) when tab_out(SOUTH)="000" and free(SOUTH)='0' else
+	tx(SOUTH) <= data_av(LOCAL) when (tab_out(SOUTH)="100" and free(SOUTH)='0') or (tab_dup(SOUTH)='1' and free(SOUTH) = '0') else
+			data_av(EAST) when tab_out(SOUTH)="000" and free(SOUTH)='0' else
 			data_av(WEST)  when tab_out(SOUTH)="001" and free(SOUTH)='0' else
 			data_av(NORTH) when tab_out(SOUTH)="010" and free(SOUTH)='0' else
-			data_av(LOCAL) when (tab_out(SOUTH)="100" and free(SOUTH)='0') or (tab_dup(SOUTH)='1' and free(SOUTH) = '0') else
 			'0';
 
 	data_out(SOUTH) <= data_dup when tab_dup(SOUTH)='1' and free(SOUTH)='0' else

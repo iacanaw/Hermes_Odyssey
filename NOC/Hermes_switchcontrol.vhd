@@ -211,7 +211,7 @@ begin
 				when D1 =>
 					source(CONV_INTEGER(incoming)) <= CONV_VECTOR(dirx);
 					mux_out(dirx) <= incoming;
-					mux_dup(dupx) <= '1';
+					mux_dup(dupy) <= '1';
 					--FREE(porta_de_saida) <= OCUPADA
 					auxfree(dirx) <= '0';
 					auxfree(dupy) <= '0';
