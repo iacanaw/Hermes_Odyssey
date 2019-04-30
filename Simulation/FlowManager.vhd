@@ -42,16 +42,13 @@ begin
     process(clock, reset)
     variable seed1, seed2: positive;               -- seed values for random generator
     variable rand: real;
-    variable range_size : real := 256.0;
+    variable range_size : real := 32.0;
     variable range_of_rand : real := 65535.0;    -- the range of random values created will be 0 to +1000.
     begin 
         if reset = '1' then
             currentState <= S0;
         elsif rising_edge(clock) then
-
-            uniform(seed1, seed2, rand);   -- generate random number
-            rand_size <= integer(rand*range_size) + 10;  -- rescale to 0..1000, convert integer part                    
-            rand_flit <= integer(rand*range_of_rand);  -- rescale to 0..1000, convert integer part               
+ 
             case currentState is
 
                 when S0 =>
@@ -59,6 +56,11 @@ begin
 
                 when generateHeader =>
                     if(credit_i='1') then
+
+                        uniform(seed1, seed2, rand);   -- generate random number
+                        rand_size <= integer(rand*range_size) + 8;  -- rescale to 0..1000, convert integer part                    
+                        rand_flit <= integer(rand*range_of_rand);  -- rescale to 0..1000, convert integer part   
+
                         currentState <= generateSize;
                     else 
                         currentState <= generateHeader;
@@ -70,19 +72,33 @@ begin
                     pausedCycles <= (100 * (integer(rand_size) + 2)/flitRate);
 
                     if(credit_i='1') then
+
+                        uniform(seed1, seed2, rand);   -- generate random number
+                        rand_size <= integer(rand*range_size) + 8;  -- rescale to 0..1000, convert integer part                    
+                        rand_flit <= integer(rand*range_of_rand);  -- rescale to 0..1000, convert integer part   
+
                         currentState <= sendPayload;
                     else
                         currentState <= generateSize;
                     end if;  
 
                 when sendPayload =>
-                    if flitCounter = 0 then
-                        currentState <= waiting;
-                    elsif(credit_i='1') then
-                            flitCounter <= flitCounter - 1;                                       
+                    
+                    if (credit_i='1') then
+
+                        uniform(seed1, seed2, rand);   -- generate random number
+                        rand_size <= integer(rand*range_size) + 8;  -- rescale to 0..1000, convert integer part                    
+                        rand_flit <= integer(rand*range_of_rand);  -- rescale to 0..1000, convert integer part   
+
+                        flitCounter <= flitCounter - 1;                                       
+                       
+                        if flitCounter = 1 then -- last flit!
+                            currentState <= waiting;
+                        else
                             currentState <= sendPayload;
+                        end if;
                     else -- Local port haven't space on buffer
-                            currentState <= sendPayload;
+                        currentState <= sendPayload;
 
                     end if;
 
@@ -100,7 +116,7 @@ begin
         end if;
     end process;
     data_out <= words;
-    tx <= '0';--1' when (currentState = sendPayload) or (currentState = generateHeader) or (currentState = generateSize) else '0';
+    tx <= '1' when (currentState = sendPayload) or (currentState = generateHeader) or (currentState = generateSize) else '0';
     words <= x"00" & destination when currentState = generateHeader else
              std_logic_vector(to_unsigned(rand_size, TAM_FLIT)) when currentState = generateSize else
              std_logic_vector(to_unsigned(rand_flit, TAM_FLIT));

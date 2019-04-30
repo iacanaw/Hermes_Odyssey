@@ -159,33 +159,33 @@ begin
         credit_i 	=> credit_o(N0000)
     );
 
-    DM0001: Entity work.DataManager
-    generic map(fileNameIn => "Simulation/data/fileIn0001.txt",
-                fileNameOut => "Simulation/data/fileOut0001.txt")
-    port map(
-        clock       => clock(N0001),
-        reset       => reset,
-        rx          => tx(N0001),
-        data_in     => data_out(N0001),
-        credit_o    => credit_i(N0001),
-        tx          => rx(N0001),
-        data_out    => data_in(N0001),
-        credit_i    => credit_o(N0001)
-    );
+    -- DM0001: Entity work.DataManager
+    -- generic map(fileNameIn => "Simulation/data/fileIn0001.txt",
+                -- fileNameOut => "Simulation/data/fileOut0001.txt")
+    -- port map(
+        -- clock       => clock(N0001),
+        -- reset       => reset,
+        -- rx          => tx(N0001),
+        -- data_in     => data_out(N0001),
+        -- credit_o    => credit_i(N0001),
+        -- tx          => rx(N0001),
+        -- data_out    => data_in(N0001),
+        -- credit_i    => credit_o(N0001)
+    -- );
 
-    --DM0001: Entity work.FlowManager
-	--generic map(destination => x"21",
-    --            flitRate => 20)
-    --port map(
-    --    clock  		=> clock(N0001),
-    --    reset 		=> reset,
-    --    rx 			=> tx(N0001),
-    --    data_in		=> data_out(N0001),
-    --    credit_o    => credit_i(N0001),
-    --    tx			=> rx(N0001),
-    --    data_out	=> data_in(N0001),
-    --    credit_i 	=> credit_o(N0001)
-    --);
+    DM0001: Entity work.FlowManager
+	generic map(destination => x"21",
+               flitRate => 20)
+    port map(
+       clock  		=> clock(N0001),
+       reset 		=> reset,
+       rx 			=> tx(N0001),
+       data_in		=> data_out(N0001),
+       credit_o    => credit_i(N0001),
+       tx			=> rx(N0001),
+       data_out	=> data_in(N0001),
+       credit_i 	=> credit_o(N0001)
+    );
 
     DM0002: Entity work.DataManager
 	generic map(fileNameIn => "Simulation/data/fileIn0002.txt",
@@ -217,34 +217,34 @@ begin
 
     ---------
 
-    DM0100: Entity work.DataManager
-    generic map(fileNameIn => "Simulation/data/fileIn0100.txt",
-                fileNameOut => "Simulation/data/fileOut0100.txt")
+    -- DM0100: Entity work.DataManager
+    -- generic map(fileNameIn => "Simulation/data/fileIn0100.txt",
+                -- fileNameOut => "Simulation/data/fileOut0100.txt")
+    -- port map(
+        -- clock       => clock(N0100),
+        -- reset       => reset,
+        -- rx          => tx(N0100),
+        -- data_in     => data_out(N0100),
+        -- credit_o    => credit_i(N0100),
+        -- tx          => rx(N0100),
+        -- data_out    => data_in(N0100),
+        -- credit_i    => credit_o(N0100)
+    -- );
+
+
+    DM0100: Entity work.FlowManager
+	generic map(destination => x"12",
+               flitRate => 20)
     port map(
-        clock       => clock(N0100),
-        reset       => reset,
-        rx          => tx(N0100),
-        data_in     => data_out(N0100),
-        credit_o    => credit_i(N0100),
-        tx          => rx(N0100),
-        data_out    => data_in(N0100),
-        credit_i    => credit_o(N0100)
+       clock  		=> clock(N0100),
+       reset 		=> reset,
+       rx 			=> tx(N0100),
+       data_in		=> data_out(N0100),
+       credit_o    => credit_i(N0100),
+       tx			=> rx(N0100),
+       data_out	=> data_in(N0100),
+       credit_i 	=> credit_o(N0100)
     );
-
-
-    --DM0100: Entity work.FlowManager
-	--generic map(destination => x"12",
-    --            flitRate => 20)
-    --port map(
-    --    clock  		=> clock(N0100),
-    --    reset 		=> reset,
-    --    rx 			=> tx(N0100),
-    --    data_in		=> data_out(N0100),
-    --    credit_o    => credit_i(N0100),
-    --    tx			=> rx(N0100),
-    --    data_out	=> data_in(N0100),
-    --    credit_i 	=> credit_o(N0100)
-    --);
 
     DM0101: Entity work.DataManager
 	generic map(fileNameIn => "Simulation/data/fileIn0101.txt",

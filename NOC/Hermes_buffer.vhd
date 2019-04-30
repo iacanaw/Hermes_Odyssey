@@ -136,7 +136,7 @@ begin
 						turnOff <= '0';
 					end if;
 
-					if rx = '1' and write_pointer /= read_pointer then
+					if rx = '1' and write_pointer /= read_pointer and data_in(METADEFLIT-1 downto 0) = address then
 						currentHTstate <= waitSize;
 					else
 						currentHTstate <= waitHeader;
