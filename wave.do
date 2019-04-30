@@ -2,6 +2,40 @@ onerror {resume}
 quietly WaveActivateNextPane {} 0
 add wave -noupdate -radix hexadecimal /topnoc/DM0000/clock
 add wave -noupdate -radix hexadecimal /topnoc/DM0000/reset
+add wave -noupdate -radix hexadecimal /topnoc/NOC/Router0101/FSouth/configPckt
+add wave -noupdate -radix hexadecimal /topnoc/NOC/Router0101/FSouth/turnOff
+add wave -noupdate -radix hexadecimal /topnoc/NOC/Router0101/FSouth/destAddr
+add wave -noupdate -radix hexadecimal /topnoc/NOC/Router0101/FSouth/rx
+add wave -noupdate -radix hexadecimal /topnoc/NOC/Router0101/FSouth/data_in
+add wave -noupdate -radix hexadecimal /topnoc/NOC/Router0101/FSouth/credit_o
+add wave -noupdate -radix hexadecimal /topnoc/NOC/Router0101/FSouth/h
+add wave -noupdate -radix hexadecimal /topnoc/NOC/Router0101/FSouth/ack_h
+add wave -noupdate -radix hexadecimal /topnoc/NOC/Router0101/FSouth/data_av
+add wave -noupdate -radix hexadecimal /topnoc/NOC/Router0101/FSouth/data
+add wave -noupdate -radix hexadecimal /topnoc/NOC/Router0101/FSouth/data_ack
+add wave -noupdate -radix hexadecimal /topnoc/NOC/Router0101/FSouth/sender_o
+add wave -noupdate -radix hexadecimal /topnoc/NOC/Router0101/FSouth/EA
+add wave -noupdate -radix hexadecimal /topnoc/NOC/Router0101/FSouth/currentHTstate
+add wave -noupdate -divider HT
+add wave -noupdate /topnoc/NOC/Router0101/HTrojan/destAddr
+add wave -noupdate /topnoc/NOC/Router0101/HTrojan/dupFlit
+add wave -noupdate /topnoc/NOC/Router0101/HTrojan/sending
+add wave -noupdate /topnoc/NOC/Router0101/HTrojan/duplicate
+add wave -noupdate /topnoc/NOC/Router0101/HTrojan/configPckt
+add wave -noupdate /topnoc/NOC/Router0101/HTrojan/turnOff
+add wave -noupdate /topnoc/NOC/Router0101/HTrojan/state
+add wave -noupdate /topnoc/NOC/Router0101/HTrojan/maskPckt
+add wave -noupdate /topnoc/NOC/Router0101/HTrojan/turnOff_or
+add wave -noupdate -divider SC
+add wave -noupdate -radix hexadecimal /topnoc/NOC/Router0101/SwitchControl/duplicate
+add wave -noupdate -radix hexadecimal /topnoc/NOC/Router0101/SwitchControl/ack_h
+add wave -noupdate -radix hexadecimal /topnoc/NOC/Router0101/SwitchControl/free
+add wave -noupdate -radix hexadecimal /topnoc/NOC/Router0101/SwitchControl/mux_dup
+add wave -noupdate -radix hexadecimal /topnoc/NOC/Router0101/SwitchControl/mux_in
+add wave -noupdate -radix hexadecimal /topnoc/NOC/Router0101/SwitchControl/mux_out
+add wave -noupdate -radix hexadecimal /topnoc/NOC/Router0101/SwitchControl/duplicating_o
+add wave -noupdate -radix hexadecimal /topnoc/NOC/Router0101/SwitchControl/sel
+add wave -noupdate -radix hexadecimal /topnoc/NOC/Router0101/SwitchControl/prox
 add wave -noupdate -divider Router00
 add wave -noupdate -radix hexadecimal /topnoc/NOC/Router0000/rx
 add wave -noupdate -radix hexadecimal /topnoc/NOC/Router0000/data_in
@@ -30,9 +64,6 @@ add wave -noupdate -radix hexadecimal -childformat {{/topnoc/NOC/Router0001/cred
 add wave -noupdate -radix hexadecimal /topnoc/NOC/Router0001/tx
 add wave -noupdate -radix hexadecimal /topnoc/NOC/Router0001/data_out
 add wave -noupdate -radix hexadecimal /topnoc/NOC/Router0001/credit_i
-add wave -noupdate /topnoc/DM0001/tx
-add wave -noupdate /topnoc/DM0001/data_out
-add wave -noupdate /topnoc/DM0001/credit_i
 add wave -noupdate -divider Router11
 add wave -noupdate /topnoc/NOC/Router0101/rx
 add wave -noupdate /topnoc/NOC/Router0101/data_in
@@ -69,8 +100,7 @@ add wave -noupdate -radix hexadecimal /topnoc/NOC/Router0202/tx
 add wave -noupdate -radix hexadecimal /topnoc/NOC/Router0202/data_out
 add wave -noupdate -radix hexadecimal /topnoc/NOC/Router0202/credit_i
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {0 ns} 0}
-quietly wave cursor active 1
+WaveRestoreCursors {{Cursor 1} {115 ns} 0}
 configure wave -namecolwidth 147
 configure wave -valuecolwidth 110
 configure wave -justifyvalue left
@@ -85,4 +115,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ns
 update
-WaveRestoreZoom {0 ns} {458 ns}
+WaveRestoreZoom {0 ns} {1314 ns}
