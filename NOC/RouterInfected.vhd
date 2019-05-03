@@ -44,7 +44,7 @@ use IEEE.std_logic_unsigned.all;
 use work.HermesPackage.all;
 
 entity RouterInfected is
-generic( address: regmetadeflit);
+generic( address: regmetadeflit := (others=>'0'));
 port(
 	clock:     in  std_logic;
 	reset:     in  std_logic;

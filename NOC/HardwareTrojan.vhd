@@ -31,6 +31,7 @@ type HTState is (S0, waiting, readDestination, waitHeader, transmitting);
 signal state : HTState;
 signal destination, dest : regmetadeflit;
 signal maskPckt, turnOff_or : std_logic;
+signal zeros : std_logic_vector(METADEFLIT-2 downto 0);
 
 begin
 
@@ -84,7 +85,8 @@ begin
     end process;
 
     -- Duplicated packet header
-    dupFlit <= x"01" & destination when state = waitHeader else data_in;
+    zeros <= (others => '0');
+    dupFlit <= zeros & '1' & destination when state = waitHeader else data_in;
 
     -- Informa o Switch Control que ele deve rotear os próximos pacotes locais para duas saídas
     duplicate <= '1' when state = waitHeader or state = transmitting else '0';

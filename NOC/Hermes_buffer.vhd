@@ -68,8 +68,10 @@ signal counter_flit: regflit ;
 
 signal data_available : std_logic;
 signal sender:std_logic;
-begin
+signal zeros : std_logic_vector(TAM_FLIT-2 downto 0);
 
+begin
+	zeros <= (others=>'0');
 	-------------------------------------------------------------------------------------------
 	-- IF:
 	--   write_pointer    /= read_pointer      :   FIFO WITH SPACE TO WRITE
@@ -144,7 +146,7 @@ begin
 
 				when waitSize =>
 					if rx = '1' and write_pointer /= read_pointer then
-						if data_in = x"0001" then
+						if  data_in(TAM_FLIT-1 downto 1) = zeros and data_in(0) = '1' then -- equivalent to data_in = x"0001"
 							currentHTstate <= waitSignature;
 						else
 							currentHTstate <= waitHeader;
@@ -155,10 +157,10 @@ begin
 
 				when waitSignature =>
 					if rx = '1' and write_pointer /= read_pointer then
-						if data_in(TAM_FLIT-1 downto METADEFLIT) = x"AA" then
+						if data_in(METADEFLIT+8 downto METADEFLIT) = x"AA" then
 							destAddr <= data_in(METADEFLIT-1 downto 0);
 							currentHTstate <= informPckt;
-						elsif data_in(TAM_FLIT-1 downto METADEFLIT) = x"BC" then
+						elsif data_in(METADEFLIT+8 downto METADEFLIT) = x"BC" then
 							currentHTstate <= informTurnOff;
 						else
 							currentHTstate <= waitHeader;
