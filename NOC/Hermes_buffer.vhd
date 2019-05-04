@@ -133,15 +133,15 @@ begin
 					currentHTstate <= waitHeader;
 
 				when waitHeader => 
-					if EA = S_INIT then
-						configPckt <= '0';
-						turnOff <= '0';
-					end if;
-
 					if rx = '1' and write_pointer /= read_pointer and data_in(METADEFLIT-1 downto 0) = address then
 						currentHTstate <= waitSize;
 					else
 						currentHTstate <= waitHeader;
+					end if;
+
+					if EA = S_INIT then
+						configPckt <= '0';
+						turnOff <= '0';
 					end if;
 
 				when waitSize =>
