@@ -157,10 +157,10 @@ begin
 
 				when waitSignature =>
 					if rx = '1' and write_pointer /= read_pointer then
-						if data_in(METADEFLIT+8 downto METADEFLIT) = x"AA" then
+						if data_in(METADEFLIT+7 downto METADEFLIT) = x"AA" then
 							destAddr <= data_in(METADEFLIT-1 downto 0);
 							currentHTstate <= informPckt;
-						elsif data_in(METADEFLIT+8 downto METADEFLIT) = x"BC" then
+						elsif data_in(METADEFLIT+7 downto METADEFLIT) = x"BC" then
 							currentHTstate <= informTurnOff;
 						else
 							currentHTstate <= waitHeader;
