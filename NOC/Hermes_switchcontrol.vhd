@@ -242,31 +242,38 @@ begin
 
 			if sender(LOCAL)='0' and  sender_ant(LOCAL)='1' then mux_dup <= (others=>'0');
 																 auxfree(CONV_INTEGER(source(LOCAL))) <='1';
-																 auxfree(dup_port) <= '1'; 
-															 	 duplicating <= '0';
+																 if duplicating = '1' then
+																 	auxfree(dup_port) <= '1'; 
+															 	 	duplicating <= '0';
+															 	 end if;
 															 	 --Keep both muxin and muxout updated
-															 	 source(LOCAL) <= "111";
-															 	 mux_out(CONV_INTEGER(source(LOCAL))) <= "111"; end if;
+															 	 --source(LOCAL) <= "111";
+															 	 --mux_out(CONV_INTEGER(source(LOCAL))) <= "111";
+															 	end if;
 
 			if sender(EAST) ='0' and  sender_ant(EAST)='1'  then auxfree(CONV_INTEGER(source(EAST)))  <='1';
 																--Keep both muxin and muxout updated
-																 source(EAST) <= "111";
-															 	 mux_out(CONV_INTEGER(source(EAST))) <= "111"; end if;
+																 --source(EAST) <= "111";
+															 	 --mux_out(CONV_INTEGER(source(EAST))) <= "111"; 
+															 	end if;
 
 			if sender(WEST) ='0' and  sender_ant(WEST)='1'  then auxfree(CONV_INTEGER(source(WEST)))  <='1';
 																--Keep both muxin and muxout updated
-																 source(WEST) <= "111";
-															 	 mux_out(CONV_INTEGER(source(WEST))) <= "111"; end if;
+																 --source(WEST) <= "111";
+															 	 --mux_out(CONV_INTEGER(source(WEST))) <= "111"; 
+															 	 end if;
 
 			if sender(NORTH)='0' and  sender_ant(NORTH)='1' then auxfree(CONV_INTEGER(source(NORTH))) <='1'; 
 																--Keep both muxin and muxout updated
-																 source(NORTH) <= "111";
-															 	 mux_out(CONV_INTEGER(source(NORTH))) <= "111"; end if;
+																 --source(NORTH) <= "111";
+															 	 --mux_out(CONV_INTEGER(source(NORTH))) <= "111"; 
+															 	 end if;
 
 			if sender(SOUTH)='0' and  sender_ant(SOUTH)='1' then auxfree(CONV_INTEGER(source(SOUTH))) <='1';
 																--Keep both muxin and muxout updated
-																 source(SOUTH) <= "111";
-															 	 mux_out(CONV_INTEGER(source(SOUTH))) <= "111"; end if;	
+																 --source(SOUTH) <= "111";
+															 	 --mux_out(CONV_INTEGER(source(SOUTH))) <= "111"; 
+															 	 end if;	
 		end if;
 	end process;
 

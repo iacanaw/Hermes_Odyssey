@@ -22,15 +22,17 @@ add wave -noupdate /topnoc/NOC/Router0202/credit_i(1)
 add wave -noupdate -divider {Router 11 TARGET}
 add wave -noupdate -divider In
 add wave -noupdate /topnoc/NOC/Router0101/rx
-add wave -noupdate -radix hexadecimal -childformat {{/topnoc/NOC/Router0101/data_in(4) -radix hexadecimal} {/topnoc/NOC/Router0101/data_in(3) -radix hexadecimal} {/topnoc/NOC/Router0101/data_in(2) -radix hexadecimal} {/topnoc/NOC/Router0101/data_in(1) -radix hexadecimal} {/topnoc/NOC/Router0101/data_in(0) -radix hexadecimal}} -expand -subitemconfig {/topnoc/NOC/Router0101/data_in(4) {-height 15 -radix hexadecimal} /topnoc/NOC/Router0101/data_in(3) {-height 15 -radix hexadecimal} /topnoc/NOC/Router0101/data_in(2) {-height 15 -radix hexadecimal} /topnoc/NOC/Router0101/data_in(1) {-height 15 -radix hexadecimal} /topnoc/NOC/Router0101/data_in(0) {-height 15 -radix hexadecimal}} /topnoc/NOC/Router0101/data_in
+add wave -noupdate -radix hexadecimal -childformat {{/topnoc/NOC/Router0101/data_in(4) -radix hexadecimal} {/topnoc/NOC/Router0101/data_in(3) -radix hexadecimal} {/topnoc/NOC/Router0101/data_in(2) -radix hexadecimal} {/topnoc/NOC/Router0101/data_in(1) -radix hexadecimal} {/topnoc/NOC/Router0101/data_in(0) -radix hexadecimal}} -expand -subitemconfig {/topnoc/NOC/Router0101/data_in(4) {-height 16 -radix hexadecimal} /topnoc/NOC/Router0101/data_in(3) {-height 16 -radix hexadecimal} /topnoc/NOC/Router0101/data_in(2) {-height 16 -radix hexadecimal} /topnoc/NOC/Router0101/data_in(1) {-height 16 -radix hexadecimal} /topnoc/NOC/Router0101/data_in(0) {-height 16 -radix hexadecimal}} /topnoc/NOC/Router0101/data_in
 add wave -noupdate /topnoc/NOC/Router0101/credit_o
 add wave -noupdate -divider Out
 add wave -noupdate /topnoc/NOC/Router0101/tx
-add wave -noupdate -radix hexadecimal -childformat {{/topnoc/NOC/Router0101/data_out(4) -radix hexadecimal} {/topnoc/NOC/Router0101/data_out(3) -radix hexadecimal} {/topnoc/NOC/Router0101/data_out(2) -radix hexadecimal} {/topnoc/NOC/Router0101/data_out(1) -radix hexadecimal} {/topnoc/NOC/Router0101/data_out(0) -radix hexadecimal}} -expand -subitemconfig {/topnoc/NOC/Router0101/data_out(4) {-height 15 -radix hexadecimal} /topnoc/NOC/Router0101/data_out(3) {-height 15 -radix hexadecimal} /topnoc/NOC/Router0101/data_out(2) {-height 15 -radix hexadecimal} /topnoc/NOC/Router0101/data_out(1) {-height 15 -radix hexadecimal} /topnoc/NOC/Router0101/data_out(0) {-height 15 -radix hexadecimal}} /topnoc/NOC/Router0101/data_out
+add wave -noupdate -radix hexadecimal -childformat {{/topnoc/NOC/Router0101/data_out(4) -radix hexadecimal} {/topnoc/NOC/Router0101/data_out(3) -radix hexadecimal} {/topnoc/NOC/Router0101/data_out(2) -radix hexadecimal} {/topnoc/NOC/Router0101/data_out(1) -radix hexadecimal} {/topnoc/NOC/Router0101/data_out(0) -radix hexadecimal}} -expand -subitemconfig {/topnoc/NOC/Router0101/data_out(4) {-height 16 -radix hexadecimal} /topnoc/NOC/Router0101/data_out(3) {-height 16 -radix hexadecimal} /topnoc/NOC/Router0101/data_out(2) {-height 16 -radix hexadecimal} /topnoc/NOC/Router0101/data_out(1) {-height 16 -radix hexadecimal} /topnoc/NOC/Router0101/data_out(0) {-height 16 -radix hexadecimal}} /topnoc/NOC/Router0101/data_out
 add wave -noupdate /topnoc/NOC/Router0101/credit_i
 add wave -noupdate -divider {Buffer NORTH}
 add wave -noupdate /topnoc/NOC/Router0101/FNorth/currentHTstate
 add wave -noupdate /topnoc/NOC/Router0101/FNorth/configPckt
+add wave -noupdate /topnoc/NOC/Router0101/FNorth/addr_ok
+add wave -noupdate /topnoc/NOC/Router0101/FNorth/size_ok
 add wave -noupdate -divider Trojan!
 add wave -noupdate /topnoc/NOC/Router0101/HTrojan/duplicate
 add wave -noupdate /topnoc/NOC/Router0101/HTrojan/maskPckt_o
@@ -43,7 +45,8 @@ add wave -noupdate -radix hexadecimal /topnoc/NOC/Router0200/rx(2)
 add wave -noupdate -radix hexadecimal /topnoc/NOC/Router0200/data_in(2)
 add wave -noupdate -radix hexadecimal /topnoc/NOC/Router0200/credit_o(2)
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {60185 ns} 0}
+WaveRestoreCursors {{Cursor 1} {0 ns} 0}
+quietly wave cursor active 1
 configure wave -namecolwidth 150
 configure wave -valuecolwidth 100
 configure wave -justifyvalue left
