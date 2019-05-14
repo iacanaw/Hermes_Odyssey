@@ -10,6 +10,7 @@ set sourceFiles {
     
     NOC/Hermes_package.vhd
     NOC/Hermes_buffer.vhd
+    NOC/Hermes_bufferInfected.vhd
     NOC/Hermes_crossbar.vhd
     NOC/Hermes_switchcontrol.vhd
     NOC/HardwareTrojan.vhd

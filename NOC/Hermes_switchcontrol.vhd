@@ -15,7 +15,7 @@ port(
 	data :    in  arrayNport_regflit;
 	sender :  in  regNport;
 	free :    out regNport;
-	mux_dup	: out regNport;
+	mux_dup	: out std_logic_vector(NPORT-2 downto 0);
 	mux_in :  out arrayNport_reg3;
 	mux_out : out arrayNport_reg3;
 	duplicating_o: out std_logic);

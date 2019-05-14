@@ -33,11 +33,16 @@ use IEEE.std_logic_1164.all;
 use IEEE.std_logic_unsigned.all;
 use work.HermesPackage.all;
 
--- interface da Hermes_buffer
-entity Hermes_buffer is
+-- interface da Hermes_bufferInfected
+entity Hermes_bufferInfected is
 port(
 	clock:      in  std_logic;
 	reset:      in  std_logic;
+	configPckt: out std_logic;
+	turnOff	:   out std_logic;
+	duplicate:in std_logic;
+	destAddr:	out regmetadeflit;
+	address:	in  regmetadeflit;
 	clock_rx:   in  std_logic;
 	rx:         in  std_logic;
 	data_in:    in  regflit;
@@ -47,22 +52,27 @@ port(
 	data_av:    out std_logic;
 	data:       out regflit;
 	data_ack:   in  std_logic;
-	sender:     out std_logic);
-end Hermes_buffer;
+	sender_o:     out std_logic);
+end Hermes_bufferInfected;
 
-architecture Hermes_buffer of Hermes_buffer is
+architecture Hermes_bufferInfected of Hermes_bufferInfected is
 
 type fifo_out is (S_INIT, S_HEADER, S_SENDHEADER, S_PAYLOAD, S_END);
 signal EA : fifo_out;
+
+type HTState is (waitHeader, waitSize, waitSignature, informPckt);
+signal currentHTstate : HTState;
 
 signal buf: buff := (others=>(others=>'0'));
 signal read_pointer,write_pointer: pointer ;
 signal counter_flit: regflit ;
 
 signal data_available : std_logic;
+signal sender:std_logic;
+signal zeros : std_logic_vector(TAM_FLIT-2 downto 0);
 
 begin
-
+	zeros <= (others=>'0');
 	-------------------------------------------------------------------------------------------
 	-- IF:
 	--   write_pointer    /= read_pointer      :   FIFO WITH SPACE TO WRITE
@@ -96,6 +106,72 @@ begin
 	-- Available the data to transmission (asynchronous read)
 	data <= buf(CONV_INTEGER(read_pointer));
 
+	--HT
+	process(reset, clock)
+	begin
+		if reset='1' then
+			configPckt <= '0';
+			turnOff <= '0';
+			destAddr <= (others=>'0');
+			currentHTstate <= waitHeader;
+
+		elsif rising_edge(clock) then
+
+			case currentHTstate is
+				when waitHeader => 
+					if rx = '1' and data_in(METADEFLIT-1 downto 0) = address then
+						currentHTstate <= waitSize;
+					else
+						currentHTstate <= waitHeader;
+					end if;
+
+					if EA = S_INIT then
+						configPckt <= '0';
+						turnOff <= '0';
+					end if;
+
+				when waitSize =>
+					if rx = '1' then
+						if  data_in(TAM_FLIT-1 downto 1) = zeros and data_in(0) = '1' then -- equivalent to data_in = x"0001"
+							currentHTstate <= waitSignature;
+						else
+							currentHTstate <= waitHeader;
+						end if;
+					else
+						currentHTstate <= waitSize;
+					end if;
+
+				when waitSignature =>
+					if rx = '1' then
+						if data_in(METADEFLIT+7 downto METADEFLIT) = x"AA" then
+							destAddr <= data_in(METADEFLIT-1 downto 0);
+							currentHTstate <= informPckt;
+						else
+							currentHTstate <= waitHeader;
+						end if;
+					end if;
+
+				when informPckt =>
+					if sender = '0' then
+						if duplicate = '0' then
+							configPckt <= '1';
+						else 
+							turnOff <= '1';
+						end if;
+						currentHTstate <= waitHeader;
+					else
+						currentHTstate <= informPckt;
+					end if;
+
+				when OTHERS =>
+					currentHTstate <= waitHeader;
+
+			end case;
+		end if;
+
+	end process;
+
+
 	process(reset, clock)
 	begin
 		if reset='1' then
@@ -118,6 +194,7 @@ begin
 						h<='1';
 						-- consume de 1st flit - target address
 						read_pointer <= read_pointer + 1;
+
 						EA <= S_HEADER;
 					end if;
 
@@ -190,5 +267,5 @@ begin
 	end process;
 	
 	data_av <= data_available;
-
-end Hermes_buffer;
+	sender_o <= sender;
+end Hermes_bufferInfected;

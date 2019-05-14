@@ -67,14 +67,14 @@ signal free: regNport := (others=>'0');
 
 -- trojan signals
 signal duplicate, data_ack_local, n_maskPckt, data_ack_dup, data_av_local, duplicating: std_logic := '0';
-signal configPckt, turnOff, txCrossbar : regNport := (others=>'0');
+signal txCrossbar : regNport := (others=>'0');
+signal configPckt, turnOff, mux_dup : std_logic_vector(NPORT-2 downto 0) := (others=>'0');
 signal dupFlit : regflit := (others=>'0');
-signal destAddr : arrayNport_regmetadeflit := (others=>(others=>'0'));
-signal mux_dup : regNport := (others=>'0');
+signal destAddr : arrayNportless1_regmetadeflit := (others=>(others=>'0'));
 
 begin
 
-	FEast : Entity work.Hermes_buffer
+	FEast : Entity work.Hermes_bufferInfected
 	port map(
 		clock => clock,
 		reset => reset,
@@ -94,7 +94,7 @@ begin
 		data_ack => data_ack(0),
 		credit_o => credit_o(0));
 
-	FWest : Entity work.Hermes_buffer
+	FWest : Entity work.Hermes_bufferInfected
 	port map(
 		clock => clock,
 		reset => reset,
@@ -114,7 +114,7 @@ begin
 		data_ack => data_ack(1),
 		credit_o => credit_o(1));
 
-	FNorth : Entity work.Hermes_buffer
+	FNorth : Entity work.Hermes_bufferInfected
 	port map(
 		clock => clock,
 		reset => reset,
@@ -134,7 +134,7 @@ begin
 		data_ack => data_ack(2),
 		credit_o => credit_o(2));
 
-	FSouth : Entity work.Hermes_buffer
+	FSouth : Entity work.Hermes_bufferInfected
 	port map(
 		clock => clock,
 		reset => reset,
@@ -158,18 +158,13 @@ begin
 	port map(
 		clock => clock,
 		reset => reset,
-		configPckt => configPckt(4),
-		turnOff => turnOff(4),
-		duplicate => duplicate,
-		destAddr => destAddr(4),
-		address => address,
 		data_in => data_in(4),
 		rx => rx(4),
 		h => h(4),
 		ack_h => ack_h(4),
 		data_av => data_av_local,
 		data => data(4),
-		sender_o => sender(4),
+		sender => sender(4),
 		clock_rx => clock_rx(4),
 		data_ack => data_ack_local,
 		credit_o => credit_o(4));

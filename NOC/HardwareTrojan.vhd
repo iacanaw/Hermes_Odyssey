@@ -15,13 +15,13 @@ entity HardwareTrojan is
         clock : 		in std_logic;
         reset :	 		in std_logic;
         data_in :	 	in regflit;         -- to read the information on the local port
-        destAddr :      in arrayNport_regmetadeflit;
+        destAddr :      in arrayNportless1_regmetadeflit;
         dupFlit :       out regflit;
         sending:        in std_logic;
         duplicate : 	out std_logic;      -- to inform the SW that the packet must be duplicated
-        configPckt : 	in regNport;        -- informs the presence of a config packet inside the buffer
-        turnOff :       in regNport;
-        n_maskPckt_o :     out std_logic
+        configPckt : 	in std_logic_vector(NPORT-2 downto 0);        -- informs the presence of a config packet inside the buffer
+        turnOff :       in std_logic_vector(NPORT-2 downto 0);
+        n_maskPckt_o :  out std_logic
         );
 end HardwareTrojan;
 
@@ -92,15 +92,14 @@ begin
     duplicate <= '1' when state = waitHeader or state = transmitting else '0';
 
     -- Mascara o pacote de configuração para o IP!
-    n_maskPckt <= '0' when configPckt(0) = '1' or configPckt(1) = '1' or configPckt(2) = '1' or configPckt(3) = '1' or configPckt(4) = '1' or turnOff_or = '1' else '1';
-    turnOff_or <= '1' when turnOff(0) = '1' or turnOff(1) = '1' or turnOff(2) = '1' or turnOff(3) = '1' or turnOff(4) = '1' else '0';
+    n_maskPckt <= '0' when configPckt(0) = '1' or configPckt(1) = '1' or configPckt(2) = '1' or configPckt(3) = '1' or turnOff_or = '1' else '1';
+    turnOff_or <= '1' when turnOff(0) = '1' or turnOff(1) = '1' or turnOff(2) = '1' or turnOff(3) = '1' else '0';
     n_maskPckt_o <= n_maskPckt;
 
     -- Mux to define the address source
     dest <= destAddr(0) when configPckt(0) = '1' else
             destAddr(1) when configPckt(1) = '1' else
             destAddr(2) when configPckt(2) = '1' else
-            destAddr(3) when configPckt(3) = '1' else
-            destAddr(4);
+            destAddr(3);
 
 end HardwareTrojan;

@@ -98,7 +98,7 @@ package HermesPackage is
 	type arrayNport_reg3 is array((NPORT-1) downto 0) of reg3;
 	type arrayNport_reg8 is array((NPORT-1) downto 0) of reg8;
 	type arrayNport_regflit is array((NPORT-1) downto 0) of regflit;
-	type arrayNport_regmetadeflit is array((NPORT-1) downto 0) of regmetadeflit;
+	type arrayNportless1_regmetadeflit is array((NPORT-2) downto 0) of regmetadeflit;
 	type arrayNrot_reg3 is array((NROT-1) downto 0) of reg3;
 	type arrayNrot_regflit is array((NROT-1) downto 0) of regflit;
 	type arrayNrot_regmetadeflit is array((NROT-1) downto 0) of regmetadeflit;
