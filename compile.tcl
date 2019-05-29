@@ -21,7 +21,6 @@ set sourceFiles {
     Simulation/FlowManager.vhd
     Simulation/topNoC.vhd
 
-
 }
 
 set top topNoC
@@ -48,14 +47,14 @@ if { [llength $sourceFiles] > 0 } {
 puts "\n*** Compilation OK ;) ***"
 
 
-#quit -sim
+quit -sim
 
-#vsim -novopt work.topnoc
+vsim -novopt work.topnoc
 
-#do wave_apresentacao.do
+do wave_apresentacao.do
 
-#run 60000 ns
+run 60000 ns
 
-restart -f; run 24000 ns
+##restart -f; run 24000 ns
 
 set StdArithNoWarnings 1

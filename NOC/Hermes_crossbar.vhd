@@ -1,16 +1,3 @@
-----------------------------------------------------------------
---                                   CROSSBAR
---                                    --------------
---              DATA_AV ->|                 |
---              DATA_IN ->|                 |
---            DATA_ACK <-|                 |-> TX
---                 SENDER ->|                 |-> DATA_OUT
---                       FREE ->|                  |<- CREDIT_I
---                 TAB_IN ->|                  |
---              TAB_OUT ->|                  |
---                                    --------------
-----------------------------------------------------------------
-
 library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.std_logic_unsigned.all;

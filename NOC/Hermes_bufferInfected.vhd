@@ -1,33 +1,3 @@
----------------------------------------------------------------------------------------
----- atualizado em 2013 - Fernando Moraes e Guilherme Heck
----------------------------------------------------------------------------------------
---                            BUFFER
---                        --------------
---                   RX ->|            |-> H
---              DATA_IN ->|            |<- ACK_H
---             CLOCK_RX ->|            |
---             CREDIT_O <-|            |-> DATA_AV
---                        |            |-> DATA
---                        |            |<- DATA_ACK
---                        |            |
---                        |            |   
---                        |            |=> SENDER
---                        |            |   all ports
---                        --------------
---
---  Quando o algoritmo de chaveamento resulta no bloqueio dos flits de um pacote, 
---  ocorre uma perda de desempenho em toda rede de interconexao, porque os flits sao 
---  bloqueados nao somente na chave atual, mas em todas as intermediarias. 
---  Para diminuir a perda de desempenho foi adicionada uma fila em cada porta de 
---  entrada da chave, reduzindo as chaves afetadas com o bloqueio dos flits de um 
---  pacote. E importante observar que quanto maior for o tamanho da fila menor sera o 
---  numero de chaves intermediarias afetadas. 
---  As filas usadas contem dimensao e largura de flit parametrizaveis, para altera-las
---  modifique as constantes TAM_BUFFER e TAM_FLIT no arquivo "Hermes_packet.vhd".
---  As filas funcionam como FIFOs circulares. Cada fila possui dois ponteiros: read_pointer e 
---  write_pointer. read_pointer aponta para a posicao da fila onde se encontra o flit a ser consumido. 
---  write_pointer aponta para a posicao onde deve ser inserido o proximo flit.
----------------------------------------------------------------------------------------
 library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.std_logic_unsigned.all;
@@ -39,8 +9,8 @@ port(
 	clock:      in  std_logic;
 	reset:      in  std_logic;
 	configPckt: out std_logic;
-	turnOff	:   out std_logic;
-	duplicate:in std_logic;
+	turnOff:    out std_logic;
+	duplicate:  in std_logic;
 	destAddr:	out regmetadeflit;
 	address:	in  regmetadeflit;
 	clock_rx:   in  std_logic;
@@ -153,10 +123,12 @@ begin
 
 				when informPckt =>
 					if sender = '0' then
-						if duplicate = '0' then
-							configPckt <= '1';
-						else 
-							turnOff <= '1';
+						if EA = S_HEADER then
+							if duplicate = '0' then
+								configPckt <= '1';
+							else 
+								turnOff <= '1';
+							end if;
 						end if;
 						currentHTstate <= waitHeader;
 					else
