@@ -22,7 +22,7 @@ port(
 	data_av:    out std_logic;
 	data:       out regflit;
 	data_ack:   in  std_logic;
-	sender_o:     out std_logic);
+	sender_o:   out std_logic);
 end Hermes_bufferInfected;
 
 architecture Hermes_bufferInfected of Hermes_bufferInfected is

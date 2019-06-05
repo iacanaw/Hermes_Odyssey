@@ -10,7 +10,7 @@ port(
 	data_dup:	 in  regflit;
 	data_ack:    out regNport;
 	data_ack_dup:out std_logic;
-	sender:      in  regNport;
+	--sender:      in  regNport;
 	free:        in  regNport;
 	tab_in:      in  arrayNport_reg3;
 	tab_out:     in  arrayNport_reg3;
