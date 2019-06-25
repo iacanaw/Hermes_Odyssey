@@ -292,7 +292,7 @@ int Syscall(unsigned int service, unsigned int arg0, unsigned int arg1, unsigned
 			schedule_after_syscall = 1;
 			current->scheduling_ptr->waiting_msg = 1;
 			current->raw_recv = 1;
-			putsv("Task is waiting message: ", (unsigned int)current);
+			putsv("Task is waiting message: ", (unsigned int)current->id);
 			return 0;
 
 		case EXIT:
@@ -608,11 +608,13 @@ int handle_packet(volatile ServiceHeader * p) {
 	TCB * tcb_ptr = 0;
 
 	need_scheduling = 0;
-
+	puts("Entrei em handle_packet!\n"); //HEADER
+	putsv("header: ", (unsigned int)p->header);
 	// Verifica se o header possui o bit usado pelo da HT pra informar o uso do algoritmo YX
-	if (p->header >= 0x00010000){ // AQUI
+	putsv("servico: ", (unsigned int)p->service); 
+	if ((unsigned int)p->header > 65535 && p->service != 32){ // AQUI
 		
-		puts("Pacote duplicado encontrado!");
+		puts("Pacote duplicado DE SERVIÇO encontrado!\n");
 		
 		// procura a tarefa consumidor (maligna)
 		tcb_ptr = searchTCB(p->consumer_task);
@@ -623,19 +625,23 @@ int handle_packet(volatile ServiceHeader * p) {
 		// informa o tamanho da mensagem
 		msg_ptr->length = p->msg_lenght;
 
-		DMNI_read_data((unsigned int)msg_ptr->msg, msg_ptr->length);
-
+		putsv("Tamanho da msgh: ", (unsigned int)msg_ptr->length);
+		
 		tcb_ptr->reg[0] = 1;
 
 		// libera o raw recv
-		tcb_ptr->raw_recv = 0;
+		tcb_ptr->raw_recv = 1;
 
 		//Release task to execute
 		tcb_ptr->scheduling_ptr->waiting_msg = 0;
-		
 
+		if (current == &idle_tcb){
+			need_scheduling = 1;
+		}
+		
 	}
 	else{
+		puts("ELSE!\n");
 		switch (p->service) {
 
 		case MESSAGE_REQUEST: //This case is the most complicated of the Memphis if you understand it, so you understand all task communication protocol
@@ -704,6 +710,8 @@ int handle_packet(volatile ServiceHeader * p) {
 			DMNI_read_data((unsigned int)msg_ptr->msg, msg_ptr->length);
 
 			tcb_ptr->reg[0] = 1;
+
+			tcb_ptr->raw_recv = 0; // AQUI
 
 			//Release task to execute
 			tcb_ptr->scheduling_ptr->waiting_msg = 0;
@@ -902,7 +910,7 @@ void OS_InterruptServiceRoutine(unsigned int status) {
 
 	//***** Check if interruption comes from NoC
 	if ( status & IRQ_NOC ){
-
+		puts("Cheking if the interruption comes from NoC!\n");
 		read_packet((ServiceHeader *)&p);
 
 		tcb_ptr = get_task_in_raw_receive();
@@ -913,17 +921,16 @@ void OS_InterruptServiceRoutine(unsigned int status) {
 		} 
 
 		if (MemoryRead(DMNI_SEND_ACTIVE) && (p.service == MESSAGE_REQUEST || p.service == TASK_MIGRATION) ){
-
+			puts("add_pending_service \n"); // AQUI
 			add_pending_service((ServiceHeader *)&p);
 
 		} else {
-
+			puts("handle_packet \n"); // AQUI
 			call_scheduler = handle_packet(&p);
 		}
 
 	//**** Handles remaining packets
 	} else if (status & IRQ_PENDING_SERVICE) {
-
 		next_service = get_next_pending_service();
 		if (next_service){
 			call_scheduler = handle_packet(next_service);
@@ -937,25 +944,26 @@ void OS_InterruptServiceRoutine(unsigned int status) {
 
 
 	if ( status & IRQ_SCHEDULER ){
-
+		puts("Setando scheduler! \n");// AQUI
 		call_scheduler = 1;
 	}
 
 
 	if (call_scheduler){
-
+		puts("call_scheduler\n");// AQUI
 		Scheduler();
 
 	} else if (current == &idle_tcb){
-
+		puts("current == &idle_tcb\n");// AQUI
 		last_idle_time = MemoryRead(TICK_COUNTER);
 
 		MemoryWrite(SCHEDULING_REPORT, IDLE);
 
 	} else {
+		puts("else\n");// AQUI
 		MemoryWrite(SCHEDULING_REPORT, current->id);
 	}
-
+	puts("ASM_RunScheduledTask \n"); // AQUI
     /*runs the scheduled task*/
     ASM_RunScheduledTask(current);
 }
