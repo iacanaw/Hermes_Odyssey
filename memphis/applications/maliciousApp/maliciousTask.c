@@ -2,7 +2,7 @@
 #include<stdlib.h>
 
 volatile unsigned int configPckt[3];
-Message capturedMsg;
+Message capturedMsg1, capturedMsg2;
 
 int main(){
     unsigned int myAddress;
@@ -21,14 +21,25 @@ int main(){
     for(i =0; i<3; i++) Echo(itoa(configPckt[i]));
     Echo("Configuration packet enviado com sucesso!");
 
-    while(1){
-        Echo("Aguardando nova mensagem...");
-        RawReceive(&capturedMsg);
-        Echo("Mensagem recebida!");
-        for(i=0; i<capturedMsg.length; i++){
-            Echo(itoa(capturedMsg.msg[i]));
-        }
+
+    Echo("Aguardando primeira mensagem...");
+    RawReceive(&capturedMsg1);
+    Echo("Aguardando segunda mensagem...");
+    RawReceive(&capturedMsg2);
+    Echo("Mensagens recebidas!");
+
+    Echo("Desabilitando HT...");
+    RawSend(configPckt, 3);
+    Echo("Exibindo mensagem1...");
+    for(i=0; i<capturedMsg1.length; i++){
+        Echo(itoa(capturedMsg1.msg[i]));
+    }
+    Echo("Exibindo mensagem2...");
+    for(i=0; i<capturedMsg2.length; i++){
+        Echo(itoa(capturedMsg2.msg[i]));
     }
 
+    Echo("THE END!");
+    
     exit();
 }
