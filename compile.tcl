@@ -8,14 +8,14 @@ set compiler vcom
 
 set sourceFiles {
     
-    NOC/Hermes_package.vhd
-    NOC/Hermes_buffer.vhd
-    NOC/Hermes_bufferInfected.vhd
-    NOC/Hermes_crossbar.vhd
-    NOC/Hermes_switchcontrol.vhd
-    NOC/HardwareTrojan.vhd
-    NOC/RouterInfected.vhd
-    NOC/NOC.vhd
+    HermesOdyssey/Hermes_package.vhd
+    HermesOdyssey/Hermes_buffer.vhd
+    HermesOdyssey/Hermes_bufferInfected.vhd
+    HermesOdyssey/Hermes_crossbar.vhd
+    HermesOdyssey/Hermes_switchcontrol.vhd
+    HermesOdyssey/HardwareTrojan.vhd
+    HermesOdyssey/RouterInfected.vhd
+    HermesOdyssey/NOC.vhd
     Simulation/Text_Package.vhd
     Simulation/DataManager.vhd
     Simulation/FlowManager.vhd

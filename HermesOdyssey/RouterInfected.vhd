@@ -153,7 +153,6 @@ begin
 		data_ack => data_ack,
 		data_dup => dupFlit,
 		data_ack_dup => data_ack_dup,
-		sender => sender,
 		free => free,
 		tab_in => mux_in,
 		tab_out => mux_out,
