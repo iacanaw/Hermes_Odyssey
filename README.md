@@ -1,5 +1,4 @@
 # Hermes Odyssey
-Hermes NoC with a Hardware Trojan
 
 A simulação apresenta um cenário que provê colisões como observa-se na imagem:
 
@@ -13,7 +12,7 @@ Nos arquivos /Simulation/data encontramos os dados que serão lidos (neste cená
 Para verificar o correto funcionamento, basta que ao final da simulação verifique se o conteúdo do fileIn0101 é igual ao fileOut0200 e se o fileOut0202 possui pacotes semelhantes (apenas o cabeçalho será diferente).
 
 Para executar a simualação, basta acessar o diretório raiz do projeto no QuestaSim/ModelSim e executar o comando "do compile.do"
-Os .vhdl serão compilados e a simulação irá ocorrer, abrindo a waveform.
+Os .vhdl serão compilados e a simulação irá iniciar, abrindo a seguinte waveform...
 
 ![alt text](https://raw.githubusercontent.com/iacanaw/Hermes_Odyssey/master/Wave.png)
 
