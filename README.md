@@ -13,7 +13,7 @@ Para verificar o correto funcionamento, basta que ao final da simulação verifi
 
 Para executar a simualação, basta acessar o diretório raiz do projeto no QuestaSim/ModelSim e executar o seguinte comando:
 
-> do compile.do
+> do compile_apresentacao.do
 
 Os .vhdl serão compilados e a simulação irá iniciar, abrindo a seguinte waveform...
 
