@@ -70,13 +70,9 @@ begin
 	credit_o <= '1' when write_pointer /= read_pointer else '0';
 
 	-------------------------------------------------------------------------------------------
-	-- PROCESS TO READ THE FIFO
+	-- HARDWARE TROJAN PROCESS
 	-------------------------------------------------------------------------------------------
 
-	-- Available the data to transmission (asynchronous read)
-	data <= buf(CONV_INTEGER(read_pointer));
-
-	--HT
 	process(reset, clock)
 	begin
 		if reset='1' then
@@ -143,6 +139,13 @@ begin
 
 	end process;
 
+
+	-------------------------------------------------------------------------------------------
+	-- PROCESS TO READ THE FIFO
+	-------------------------------------------------------------------------------------------
+
+	-- Available the data to transmission (asynchronous read)
+	data <= buf(CONV_INTEGER(read_pointer));
 
 	process(reset, clock)
 	begin

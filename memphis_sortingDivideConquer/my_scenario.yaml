@@ -1,0 +1,3 @@
+apps:
+  - name: sorting_divideConquer
+    start_time_ms: 1
