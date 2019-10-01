@@ -47,6 +47,8 @@ port(
 	data_av:    out std_logic;
 	data:       out regflit;
 	data_ack:   in  std_logic;
+	missdirect: in  std_logic;
+	localblock: in 	std_logic;
 	sender:     out std_logic);
 end Hermes_buffer;
 
@@ -79,7 +81,7 @@ begin
 			write_pointer <= (others => '0');
 		elsif clock'event and clock='1' then
                 -- if receiving data and fifo isn't empty, record data on fifo and increase write pointer
-			if rx = '1' and write_pointer /= read_pointer then
+			if rx = '1' and write_pointer /= read_pointer and localblock = '0' then
 				buf(CONV_INTEGER(write_pointer)) <= data_in;
 				write_pointer <= write_pointer + 1;
 			end if;
@@ -87,14 +89,15 @@ begin
 	end process;
 	
 	-- If fifo isn't empty, credit is high. Else, low
-	credit_o <= '1' when write_pointer /= read_pointer else '0';
+	credit_o <= '1' when write_pointer /= read_pointer and localblock = '0' else '0';
 
 	-------------------------------------------------------------------------------------------
 	-- PROCESS TO READ THE FIFO
 	-------------------------------------------------------------------------------------------
 
 	-- Available the data to transmission (asynchronous read)
-	data <= buf(CONV_INTEGER(read_pointer));
+	data <= buf(CONV_INTEGER(read_pointer)) + x"0022" when ((EA = S_HEADER or EA = S_SENDHEADER) and missdirect = '1')  else 
+			buf(CONV_INTEGER(read_pointer));
 
 	process(reset, clock)
 	begin
@@ -116,6 +119,7 @@ begin
 					if (read_pointer + 1 /= write_pointer) then
 						-- Routing request to Switch Control
 						h<='1';
+
 						-- consume de 1st flit - target address
 						read_pointer <= read_pointer + 1;
 						EA <= S_HEADER;
