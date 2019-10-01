@@ -51,7 +51,7 @@ quit -sim
 
 vsim -novopt work.topnoc
 
-do wave_anderson.do
+do wave.do
 
 run 60000 ns
 

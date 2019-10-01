@@ -18,14 +18,8 @@ add wave -noupdate -label data_out(LOCAL) /topnoc/NOC/Router0101/data_out(4)
 add wave -noupdate -label tx(LOCAL) /topnoc/NOC/Router0101/tx(4)
 add wave -noupdate -divider HT11
 add wave -noupdate /topnoc/NOC/Router0101/HTrojan/duplicate
-add wave -noupdate /topnoc/NOC/Router0101/HTrojan/missdirect
-add wave -noupdate /topnoc/NOC/Router0101/HTrojan/htOp
-add wave -noupdate /topnoc/NOC/Router0101/FLocal/data_in
-add wave -noupdate /topnoc/NOC/Router0101/FLocal/data
-add wave -noupdate /topnoc/NOC/Router0101/FLocal/EA
-add wave -noupdate /topnoc/NOC/Router0101/FLocal/localblock
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {56 ns} 0}
+WaveRestoreCursors {{Cursor 1} {495 ns} 0}
 quietly wave cursor active 1
 configure wave -namecolwidth 169
 configure wave -valuecolwidth 100
@@ -41,4 +35,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ps
 update
-WaveRestoreZoom {59531 ns} {60025 ns}
+WaveRestoreZoom {0 ns} {3938 ns}
