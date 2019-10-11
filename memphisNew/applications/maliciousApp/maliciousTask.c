@@ -31,7 +31,10 @@ int main(){
     }
     Echo("Desabilitando HT...");
     RawSend(configPckt, 3);
+<<<<<<< HEAD
     //Recebe a proxima mensagem raw
+=======
+>>>>>>> 76f9cd3ab8966cc6544fd300b4bcb30518288387
     for(j=0;j<20;j++){
         Echo("Exibindo Mensagens...");
         for(i=0; i<capturedMsg[j].length; i++){
@@ -39,7 +42,11 @@ int main(){
         }
     }
     Echo("DUPLICATION END!");
+<<<<<<< HEAD
 /*
+=======
+
+>>>>>>> 76f9cd3ab8966cc6544fd300b4bcb30518288387
     // DUPLICATE
     //
     configPckt[0] = 0x00000001;
@@ -61,7 +68,11 @@ int main(){
     RawSend(configPckt, 3);
 
     //MISSROUTING
+<<<<<<< HEAD
     configPckt[0] = 0x00000001;
+=======
+    //configPckt[0] = 0x00000001;
+>>>>>>> 76f9cd3ab8966cc6544fd300b4bcb30518288387
     configPckt[1] = 0x00000001;
     configPckt[2] = 0x6AAA0003; //0xAAAA0000 + myAddress;
     tick = 0;
@@ -73,6 +84,10 @@ int main(){
     for(i =0; i<3; i++) Echo(itoa(configPckt[i]));
     Echo("Configuration packet enviado com sucesso!");
     Echo("THE END!");
+<<<<<<< HEAD
     */
+=======
+    
+>>>>>>> 76f9cd3ab8966cc6544fd300b4bcb30518288387
     exit();
 }

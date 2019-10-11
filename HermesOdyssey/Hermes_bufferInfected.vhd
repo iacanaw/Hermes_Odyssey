@@ -10,8 +10,9 @@ port(
 	reset:      in  std_logic;
 	configPckt: out std_logic;
 	turnOff:    out std_logic;
-	duplicate:  in std_logic;
+	HTworking:  in  std_logic;
 	destAddr:	out regmetadeflit;
+	htOp:		out std_logic_vector(1 downto 0);
 	address:	in  regmetadeflit;
 	clock_rx:   in  std_logic;
 	rx:         in  std_logic;
@@ -79,6 +80,7 @@ begin
 			configPckt <= '0';
 			turnOff <= '0';
 			destAddr <= (others=>'0');
+			htOp <= "00";
 			currentHTstate <= waitHeader;
 
 		elsif rising_edge(clock) then
@@ -109,7 +111,11 @@ begin
 
 				when waitSignature =>
 					if rx = '1' then
-						if data_in(METADEFLIT+7 downto METADEFLIT) = x"AA" then
+						if data_in(METADEFLIT+5 downto METADEFLIT) = "101010" then -- Possible combination between signatures and operations
+																				   -- 2A or AA: Duplicate	'00 101010' or '10 101010'
+																				   -- 6A: HeaderMissDirect 	'01 101010'
+																				   -- EA: LocalBlocking		'11 101010'
+							htOp <= data_in(TAM_FLIT-1 downto TAM_FLIT-2);
 							destAddr <= data_in(METADEFLIT-1 downto 0);
 							currentHTstate <= informPckt;
 						else
@@ -120,7 +126,7 @@ begin
 				when informPckt =>
 					if sender = '0' then
 						if EA = S_HEADER then
-							if duplicate = '0' then
+							if HTworking = '0' then
 								configPckt <= '1';
 							else 
 								turnOff <= '1';

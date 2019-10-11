@@ -714,11 +714,14 @@ int handle_packet(volatile ServiceHeader * p) {
 
 			DMNI_read_data((unsigned int)msg_ptr->msg, msg_ptr->length);
 
+<<<<<<< HEAD
 			if (tcb_ptr == 0){
 				puts("\nPacote descartado!!!!\n");
 				break;
 			}
 
+=======
+>>>>>>> 76f9cd3ab8966cc6544fd300b4bcb30518288387
 			tcb_ptr->reg[0] = 1;
 
 			tcb_ptr->raw_recv = 0; // AQUI
@@ -928,10 +931,14 @@ void OS_InterruptServiceRoutine(unsigned int status) {
 		if(tcb_ptr){
 			putsv("================ Tarefa encontrada id: ", (unsigned int)tcb_ptr->id); puts("\n");
 			p.consumer_task = tcb_ptr->id;
+<<<<<<< HEAD
 		} /*else {
 			puts("TCB null, parou aqui\n");
 			while(1);
 		}*/
+=======
+		} 
+>>>>>>> 76f9cd3ab8966cc6544fd300b4bcb30518288387
 
 		if (MemoryRead(DMNI_SEND_ACTIVE) && (p.service == MESSAGE_REQUEST || p.service == TASK_MIGRATION) ){
 			//puts("add_pending_service \n"); // AQUI
