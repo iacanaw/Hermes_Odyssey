@@ -60,7 +60,7 @@ architecture dmni of dmni is
    constant DMNI_TIMER: std_logic_vector(4 downto 0):="10000";
    constant WORD_SIZE: std_logic_vector(4 downto 0):="00100";
    
-   type dmni_state is (WAIT_state, LOAD, COPY_FROM_MEM, COPY_TO_MEM, FINISH);
+   type dmni_state is (WAIT_state, LOAD, COPY_FROM_MEM, COPY_TO_MEM, DISCART, FINISH);
    signal DMNI_Send: dmni_state;
    signal DMNI_Receive: dmni_state;
    
@@ -141,7 +141,7 @@ begin
           case ARB is                
               when ROUND =>
                   if prio = '0' then
-                    if DMNI_Receive = COPY_TO_MEM then
+                    if DMNI_Receive = COPY_TO_MEM OR DMNI_Receive = DISCART  then
                        ARB <= RECEIVE;
                        read_enable <= '1';                        
                     elsif send_active_2 = '1' then
@@ -152,7 +152,7 @@ begin
                     if send_active_2 = '1' then
                       ARB <= SEND;
                       write_enable <= '1';
-                    elsif DMNI_Receive = COPY_TO_MEM then
+                    elsif DMNI_Receive = COPY_TO_MEM OR DMNI_Receive = DISCART then
                       ARB <= RECEIVE;
                       read_enable <= '1';
                     end if;
@@ -230,13 +230,23 @@ begin
       case( DMNI_Receive ) is        
         when WAIT_state =>
           if (start = '1' and operation = '1') then
-            recv_address <= address - WORD_SIZE;
-            recv_size <= size - 1;
-            if(is_header(CONV_INTEGER(first)) = '1' and intr_counter_temp > 0) then
-              intr_counter_temp <= intr_counter_temp -1;
+            if (address = x"00000000") then
+              recv_address <= x"00000000";
+              recv_size <= size - 1;
+              if(is_header(CONV_INTEGER(first)) = '1' and intr_counter_temp > 0) then
+                intr_counter_temp <= intr_counter_temp -1;
+              end if;
+              receive_active_2 <= '1';
+              DMNI_Receive <= DISCART;
+            else 
+              recv_address <= address - WORD_SIZE;
+              recv_size <= size - 1;
+              if(is_header(CONV_INTEGER(first)) = '1' and intr_counter_temp > 0) then
+                intr_counter_temp <= intr_counter_temp -1;
+              end if;
+              receive_active_2 <= '1';
+              DMNI_Receive <= COPY_TO_MEM;
             end if;
-            receive_active_2 <= '1';
-            DMNI_Receive <= COPY_TO_MEM;
           end if;
 
         when COPY_TO_MEM =>
@@ -252,6 +262,19 @@ begin
             end if ;
           else
             mem_byte_we <= "0000";
+          end if;
+        
+        when DISCART =>
+          mem_byte_we <= "0000";  
+          if (read_enable = '1') then
+            recv_size <= recv_size -1;
+            first <= first + 1;
+            add_buffer <= '0';
+            if (recv_size = 0) then
+              DMNI_Receive <= FINISH;
+            else 
+              DMNI_Receive <= DISCART;
+            end if ;
           end if;
 
         when FINISH =>
