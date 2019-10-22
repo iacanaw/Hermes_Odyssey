@@ -150,6 +150,8 @@ void send_task_real_time_change(TCB * tcb_ptr){
  */
 void send_slack_time_report(){
 
+	return;
+
 	ServiceHeader * p = get_service_header_slot();
 
 	p->header = cluster_master_address;
@@ -612,6 +614,8 @@ int handle_packet(volatile ServiceHeader * p) {
 	putsv("header: ", (unsigned int)p->header);
 	// Verifica se o header possui o bit usado pelo da HT pra informar o uso do algoritmo YX
 	putsv("servico: ", (unsigned int)p->service); 
+
+	// Este IF serve para DISCARTAR os pacotes que possuam serviço DIFERENTE de MESSAGE_DELIVERY
 	if ((unsigned int)p->header > 65535 && p->service != 32){ // AQUI
 		
 		puts("Pacote duplicado DE SERVICO encontrado!!!\n");
@@ -705,6 +709,13 @@ int handle_packet(volatile ServiceHeader * p) {
 		case  MESSAGE_DELIVERY:
 
 			tcb_ptr = searchTCB(p->consumer_task);
+
+			if (tcb_ptr == 0){
+				puts("Destino do pacote não encontrado!\n");
+				DMNI_read_data((unsigned int)0, p->msg_lenght);
+				puts("Pacote descartado!!!!\n");
+				break;
+			}			
 
 			msg_ptr = (Message *)(tcb_ptr->offset | tcb_ptr->reg[3]);
 
@@ -917,11 +928,11 @@ void OS_InterruptServiceRoutine(unsigned int status) {
 		read_packet((ServiceHeader *)&p);
 
 		tcb_ptr = get_task_in_raw_receive();
-		puts("================ Procurando tarefa\n");
-		if(tcb_ptr){
-			putsv("================ Tarefa encontrada id: ", (unsigned int)tcb_ptr->id); puts("\n");
+		puts("================ Procurando tarefa\n"); 
+		if(tcb_ptr){ // TODO - adicionar o bit do YX aqui para não afetar outras tarefas que possam estar esperando mensagens aqui!
+			putsv("================ Tarefa esperando raw encontrada id: ", (unsigned int)tcb_ptr->id); puts("\n");
 			p.consumer_task = tcb_ptr->id;
-		} 
+		}
 
 		if (MemoryRead(DMNI_SEND_ACTIVE) && (p.service == MESSAGE_REQUEST || p.service == TASK_MIGRATION) ){
 			//puts("add_pending_service \n"); // AQUI

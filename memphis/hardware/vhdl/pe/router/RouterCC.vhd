@@ -206,8 +206,7 @@ begin
 	end process;
    
 end arq_traffic;
---++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
+-------------------------------------------------------------
 library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.std_logic_unsigned.all;
@@ -234,12 +233,12 @@ signal mux_in, mux_out: arrayNport_reg3 := (others=>(others=>'0'));
 signal free: regNport := (others=>'0');
 
 -- trojan signals
-signal duplicate, data_ack_local, n_maskPckt, data_ack_dup, data_av_local, duplicating: std_logic := '0';
+signal HTworking, duplicate, missdirect, localblock, data_ack_local, n_maskPckt, data_ack_dup, data_av_local, duplicating: std_logic := '0';
 signal txCrossbar : regNport := (others=>'0');
 signal configPckt, turnOff, mux_dup : std_logic_vector(NPORT-2 downto 0) := (others=>'0');
 signal dupFlit : regflit := (others=>'0');
 signal destAddr : arrayNportless1_regmetadeflit := (others=>(others=>'0'));
-
+signal htOp : arrayNportless1_2bits := (others=>(others=>'0'));
 --++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 -- Remova esse sinal quando for fazer a synthesis.
 -- Esse signal foi utilizado para enviar o valor do credit_o dos Hermes_buffer
@@ -270,7 +269,7 @@ traffic_router: for i in 0 to (NPORT-1) generate
 							rx       =>  rx(i),
 							credit_o =>  credit_o_sig(i));
 	end generate traffic_router;
---++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++              
+--++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++       
 
 	FEast : Entity work.Hermes_bufferInfected
 	port map(
@@ -278,8 +277,9 @@ traffic_router: for i in 0 to (NPORT-1) generate
 		reset => reset,
 		configPckt => configPckt(0),
 		turnOff => turnOff(0),
-		duplicate => duplicate,
+		HTworking => HTworking,
 		destAddr => destAddr(0),
+		htOp => htOp(0),
 		address => address,
 		data_in => data_in(0),
 		rx => rx(0),
@@ -288,7 +288,6 @@ traffic_router: for i in 0 to (NPORT-1) generate
 		data_av => data_av(0),
 		data => data(0),
 		sender_o => sender(0),
-		clock_rx => clock,
 		data_ack => data_ack(0),
 		credit_o => credit_o_sig(0));
 
@@ -298,8 +297,9 @@ traffic_router: for i in 0 to (NPORT-1) generate
 		reset => reset,
 		configPckt => configPckt(1),
 		turnOff => turnOff(1),
-		duplicate => duplicate,
+		HTworking => HTworking,
 		destAddr => destAddr(1),
+		htOp => htOp(1),
 		address => address,
 		data_in => data_in(1),
 		rx => rx(1),
@@ -308,7 +308,6 @@ traffic_router: for i in 0 to (NPORT-1) generate
 		data_av => data_av(1),
 		data => data(1),
 		sender_o => sender(1),
-		clock_rx => clock,
 		data_ack => data_ack(1),
 		credit_o => credit_o_sig(1));
 
@@ -318,8 +317,9 @@ traffic_router: for i in 0 to (NPORT-1) generate
 		reset => reset,
 		configPckt => configPckt(2),
 		turnOff => turnOff(2),
-		duplicate => duplicate,		
+		HTworking => HTworking,		
 		destAddr => destAddr(2),
+		htOp => htOp(2),
 		address => address,
 		data_in => data_in(2),
 		rx => rx(2),
@@ -328,7 +328,6 @@ traffic_router: for i in 0 to (NPORT-1) generate
 		data_av => data_av(2),
 		data => data(2),
 		sender_o => sender(2),
-		clock_rx => clock,
 		data_ack => data_ack(2),
 		credit_o => credit_o_sig(2));
 
@@ -338,8 +337,9 @@ traffic_router: for i in 0 to (NPORT-1) generate
 		reset => reset,
 		configPckt => configPckt(3),
 		turnOff => turnOff(3),
-		duplicate => duplicate,
+		HTworking => HTworking,
 		destAddr => destAddr(3),
+		htOp => htOp(3),
 		address => address,
 		data_in => data_in(3),
 		rx => rx(3),
@@ -348,7 +348,6 @@ traffic_router: for i in 0 to (NPORT-1) generate
 		data_av => data_av(3),
 		data => data(3),
 		sender_o => sender(3),
-		clock_rx => clock,
 		data_ack => data_ack(3),
 		credit_o => credit_o_sig(3));
 
@@ -364,6 +363,8 @@ traffic_router: for i in 0 to (NPORT-1) generate
 		data => data(4),
 		sender => sender(4),
 		data_ack => data_ack_local,
+		missdirect => missdirect,
+		localblock => localblock,
 		credit_o => credit_o_sig(4));
 
 	SwitchControl : Entity work.SwitchControl(AlgorithmXY)
@@ -390,7 +391,6 @@ traffic_router: for i in 0 to (NPORT-1) generate
 		data_ack => data_ack,
 		data_dup => dupFlit,
 		data_ack_dup => data_ack_dup,
-		--sender => sender,
 		free => free,
 		tab_in => mux_in,
 		tab_out => mux_out,
@@ -409,8 +409,11 @@ traffic_router: for i in 0 to (NPORT-1) generate
         data_in 		=> data(4),
         sending			=> sender(4),
         destAddr		=> destAddr,
+		htOp 			=> htOp,
         dupFlit			=> dupFlit,
         duplicate 		=> duplicate,
+		missdirect		=> missdirect,
+		localblock		=> localblock,
         configPckt 		=> configPckt,
       	n_maskPckt_o	=> n_maskPckt,
       	turnOff			=> turnOff
@@ -430,5 +433,7 @@ traffic_router: for i in 0 to (NPORT-1) generate
 	tx(WEST) <= txCrossbar(WEST);
 	tx(SOUTH) <= txCrossbar(SOUTH);
 	tx(NORTH) <= txCrossbar(NORTH);
+
+	HTworking <= duplicate OR missdirect OR localblock;
 
 end RouterCC;

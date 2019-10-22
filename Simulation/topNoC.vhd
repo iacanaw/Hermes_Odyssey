@@ -174,7 +174,7 @@ begin
     --);
 
     DM0001: Entity work.FlowManager
-	generic map(destination => x"21",
+	generic map(destination => x"0201",
                flitRate => 20)
     port map(
        clock  		=> clock(N0001),
@@ -233,7 +233,7 @@ begin
 
 
     DM0100: Entity work.FlowManager
-	generic map(destination => x"12",
+	generic map(destination => x"0102",
                flitRate => 20)
     port map(
        clock  		=> clock(N0100),

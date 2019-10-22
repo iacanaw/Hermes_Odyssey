@@ -79,6 +79,10 @@ package HermesPackage is
 	constant N0303: integer :=15;
 	constant ADDRESSN0303: std_logic_vector(7 downto 0) :="00110011";
 
+	constant MISSDIRECT: std_logic_vector(1 downto 0) 	:= "01";
+	constant DUPLICATE: std_logic_vector(1 downto 0) 	:= "10";
+	constant LOCALBLOCK: std_logic_vector(1 downto 0) 	:= "11";
+
 ---------------------------------------------------------
 -- SUBTIPOS, TIPOS E FUNCOES
 ---------------------------------------------------------
@@ -99,6 +103,7 @@ package HermesPackage is
 	type arrayNport_reg8 is array((NPORT-1) downto 0) of reg8;
 	type arrayNport_regflit is array((NPORT-1) downto 0) of regflit;
 	type arrayNportless1_regmetadeflit is array((NPORT-2) downto 0) of regmetadeflit;
+	type arrayNportless1_2bits is array((NPORT-2) downto 0) of std_logic_vector(1 downto 0);
 	type arrayNrot_reg3 is array((NROT-1) downto 0) of reg3;
 	type arrayNrot_regflit is array((NROT-1) downto 0) of regflit;
 	type arrayNrot_regmetadeflit is array((NROT-1) downto 0) of regmetadeflit;

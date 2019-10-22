@@ -1,42 +1,32 @@
-------------------------------------------------------------------------------------------------
---
---  DISTRIBUTED MEMPHIS  - version 5.0
---
---  Research group: GAPH-PUCRS    -    contact   fernando.moraes@pucrs.br
---
---  Distribution:  September 2013
---
---  Source name:  Hermes_buffer.vhd
---
---  Brief description: Description of queues of flits
---
 ---------------------------------------------------------------------------------------
---                                      BUFFER
---                         --------------
---                   RX ->|             |-> H
---              DATA_IN ->|             |<- ACK_H
---             CREDIT_O <-|             |
---             			  |             |-> DATA_AV
---                        |             |-> DATA
---                        |             |<- DATA_ACK
---                        |             |
---                        |             |   SENDER
---                        |             |=> de todas
---                        |             |   as portas
---                         --------------
+---- atualizado em 2013 - Fernando Moraes e Guilherme Heck
+---------------------------------------------------------------------------------------
+--                            BUFFER
+--                        --------------
+--                   RX ->|            |-> H
+--              DATA_IN ->|            |<- ACK_H
+--             CLOCK_RX ->|            |
+--             CREDIT_O <-|            |-> DATA_AV
+--                        |            |-> DATA
+--                        |            |<- DATA_ACK
+--                        |            |
+--                        |            |   
+--                        |            |=> SENDER
+--                        |            |   all ports
+--                        --------------
 --
---  Quando o algoritmo de chaveamento resulta no bloqueio dos flits de um pacote,
---  ocorre uma perda de desempenho em toda rede de interconex�o, porque os flits s�o
---  bloqueados n�o somente na chave atual, mas em todas as intermedi�rias.
---  Para diminuir a perda de desempenho foi adicionada uma fila em cada porta de
---  entrada da chave, reduzindo as chaves afetadas com o bloqueio dos flits de um
---  pacote. � importante observar que quanto maior for o tamanho da fila menor ser� o
---  n�mero de chaves intermedi�rias afetadas.
---  As filas usadas cont�m dimens�o e largura de flit parametriz�veis, para alter�-las
---  modifique as constantes TAM_BUFFER e TAM_FLIT no arquivo "packet.vhd".
---  As filas funcionam como FIFOs circulares. Cada fila possui dois ponteiros: first e
---  last. First aponta para a posi��o da fila onde se encontra o flit a ser consumido.
---  Last aponta para a posi��o onde deve ser inserido o pr�ximo flit.
+--  Quando o algoritmo de chaveamento resulta no bloqueio dos flits de um pacote, 
+--  ocorre uma perda de desempenho em toda rede de interconexao, porque os flits sao 
+--  bloqueados nao somente na chave atual, mas em todas as intermediarias. 
+--  Para diminuir a perda de desempenho foi adicionada uma fila em cada porta de 
+--  entrada da chave, reduzindo as chaves afetadas com o bloqueio dos flits de um 
+--  pacote. E importante observar que quanto maior for o tamanho da fila menor sera o 
+--  numero de chaves intermediarias afetadas. 
+--  As filas usadas contem dimensao e largura de flit parametrizaveis, para altera-las
+--  modifique as constantes TAM_BUFFER e TAM_FLIT no arquivo "Hermes_packet.vhd".
+--  As filas funcionam como FIFOs circulares. Cada fila possui dois ponteiros: read_pointer e 
+--  write_pointer. read_pointer aponta para a posicao da fila onde se encontra o flit a ser consumido. 
+--  write_pointer aponta para a posicao onde deve ser inserido o proximo flit.
 ---------------------------------------------------------------------------------------
 library IEEE;
 use IEEE.std_logic_1164.all;
@@ -46,191 +36,162 @@ use work.standards.all;
 -- interface da Hermes_buffer
 entity Hermes_buffer is
 port(
-        clock:      in  std_logic;
-        reset:      in  std_logic;
-        rx:         in  std_logic;
-        data_in:    in  regflit;
-        credit_o:   out std_logic;
-        h:          out std_logic;
-        ack_h:      in  std_logic;
-        data_av:    out std_logic;
-        data:       out regflit;
-        data_ack:   in  std_logic;
-        sender:     out std_logic);
+	clock:      in  std_logic;
+	reset:      in  std_logic;
+	rx:         in  std_logic;
+	data_in:    in  regflit;
+	credit_o:   out std_logic;
+	h:          out std_logic;
+	ack_h:      in  std_logic;
+	data_av:    out std_logic;
+	data:       out regflit;
+	data_ack:   in  std_logic;
+	missdirect: in  std_logic;
+	localblock: in 	std_logic;
+	sender:     out std_logic);
 end Hermes_buffer;
 
 architecture Hermes_buffer of Hermes_buffer is
 
-type fila_out is (S_INIT, S_PAYLOAD, S_SENDHEADER, S_HEADER, S_END, S_END2);
-signal EA : fila_out;
+type fifo_out is (S_INIT, S_HEADER, S_SENDHEADER, S_PAYLOAD, S_END);
+signal EA : fifo_out;
 
 signal buf: buff := (others=>(others=>'0'));
-signal first,last: pointer := (others=>'0');
-signal tem_espaco: std_logic := '0';
-signal counter_flit: regflit := (others=>'0');
+signal read_pointer,write_pointer: pointer ;
+signal counter_flit: regflit ;
+
+signal data_available : std_logic;
 
 begin
 
-        -------------------------------------------------------------------------------------------
-        -- ENTRADA DE DADOS NA FILA
-        -------------------------------------------------------------------------------------------
+	-------------------------------------------------------------------------------------------
+	-- IF:
+	--   write_pointer    /= read_pointer      :   FIFO WITH SPACE TO WRITE
+	--   read_pointer + 1 == write_pointer     :   FIFO EMPTY
+	--   write_pointer   == read_pointer       :   FIFO FULL
+	-------------------------------------------------------------------------------------------
 
-        -- Verifica se existe espa�o na fila para armazenamento de flits.
-        -- Se existe espa�o na fila o sinal tem_espaco_na_fila � igual 1.
-        process(reset, clock)
-        begin
-                if reset='1' then
-                        tem_espaco <= '1';
-                elsif clock'event and clock='1' then
-                        if not((first=x"0" and last=TAM_BUFFER - 1) or (first=last+1)) then
-                                tem_espaco <= '1';
---			elsif (((last - first)=x"2") or ((first - last)=TAM_BUFFER - 2)) then
-                        else
-                                tem_espaco <= '0';
-                        end if;
-                end if;
-        end process;
+	-------------------------------------------------------------------------------------------
+	-- PROCESS TO WRITE INTO THE FIFO
+	-------------------------------------------------------------------------------------------
+	process(reset, clock)
+	begin
+		if reset='1' then
+			write_pointer <= (others => '0');
+		elsif clock'event and clock='1' then
+                -- if receiving data and fifo isn't empty, record data on fifo and increase write pointer
+			if rx = '1' and write_pointer /= read_pointer and localblock = '0' then
+				buf(CONV_INTEGER(write_pointer)) <= data_in;
+				write_pointer <= write_pointer + 1;
+			end if;
+		end if;
+	end process;
+	
+	-- If fifo isn't empty, credit is high. Else, low
+	credit_o <= '1' when write_pointer /= read_pointer and localblock = '0' else '0';
 
-        credit_o <= tem_espaco;
+	-------------------------------------------------------------------------------------------
+	-- PROCESS TO READ THE FIFO
+	-------------------------------------------------------------------------------------------
 
-        -- O ponteiro last � inicializado com o valor zero quando o reset � ativado.
-        -- Quando o sinal rx � ativado indicando que existe um flit na porta de entrada �
-        -- verificado se existe espa�o na fila para armazen�-lo. Se existir espa�o na fila o
-        -- flit recebido � armazenado na posi��o apontada pelo ponteiro last e o mesmo �
-        -- incrementado. Quando last atingir o tamanho da fila, ele recebe zero.
-        process(reset, clock)
-        begin
-                if reset='1' then
-                        last <= (others=>'0');
-                elsif clock'event and clock='0' then
-                        if tem_espaco='1' and rx='1' then
-                                buf(CONV_INTEGER(last)) <= data_in;
-                                --incrementa o last
-                                if(last = TAM_BUFFER - 1) then last <= (others=>'0');
-                                else last <= last + 1;
-                                end if;
-                        end if;
-                end if;
-        end process;
+	-- Available the data to transmission (asynchronous read)
+	data <= buf(CONV_INTEGER(read_pointer)) + x"2222" when ((EA = S_HEADER or EA = S_SENDHEADER) and missdirect = '1')  else 
+			buf(CONV_INTEGER(read_pointer));
 
-        -------------------------------------------------------------------------------------------
-        -- SA�DA DE DADOS NA FILA
-        -------------------------------------------------------------------------------------------
+	process(reset, clock)
+	begin
+		if reset='1' then
+			counter_flit <= (others=>'0');
+			h <= '0';
+			data_available <= '0';
+			sender <=  '0';
+			-- Initialize the read pointer with one position before the write pointer
+			read_pointer <= (others=>'1'); 
+			EA <= S_INIT;
+		elsif clock'event and clock='1' then
+			case EA is
+				when S_INIT =>
+					counter_flit <= (others=>'0');
+					h<='0';
+					data_available <= '0';
+					-- If fifo isn`t empty
+					if (read_pointer + 1 /= write_pointer) then
+						-- Routing request to Switch Control
+						h<='1';
 
-        -- disponibiliza o dado para transmiss�o.
-        data <= buf(CONV_INTEGER(first));
+						-- consume de 1st flit - target address
+						read_pointer <= read_pointer + 1;
+						EA <= S_HEADER;
+					end if;
 
-        -- Quando sinal reset � ativado a m�quina de estados avan�a para o estado S_INIT.
-        -- No estado S_INIT os sinais counter_flit (contador de flits do corpo do pacote), h (que
-        -- indica requisi��o de chaveamento) e data_av (que indica a exist�ncia de flit a ser
-        -- transmitido) s�o inicializados com zero. Se existir algum flit na fila, ou seja, os
-        -- ponteiros first e last apontarem para posi��es diferentes, a m�quina de estados avan�a
-        -- para o estado S_HEADER.
-        -- No estado S_HEADER � requisitado o chaveamento (h='1'), porque o flit na posi��o
-        -- apontada pelo ponteiro first, quando a m�quina encontra-se nesse estado, � sempre o
-        -- header do pacote. A m�quina permanece neste estado at� que receba a confirma��o do
-        -- chaveamento (ack_h='1') ent�o o sinal h recebe o valor zero e a m�quina avan�a para
-        -- S_SENDHEADER.
-        -- Em S_SENDHEADER � indicado que existe um flit a ser transmitido (data_av='1'). A m�quina de
-        -- estados permanece em S_SENDHEADER at� receber a confirma��o da transmiss�o (data_ack='1')
-        -- ent�o o ponteiro first aponta para o segundo flit do pacote e avan�a para o estado S_PAYLOAD.
-        -- No estado S_PAYLOAD � indicado que existe um flit a ser transmitido (data_av='1') quando
-        -- � recebida a confirma��o da transmiss�o (data_ack='1') � verificado qual o valor do sinal
-        -- counter_flit. Se counter_flit � igual a um, a m�quina avan�a para o estado S_INIT. Caso
-        -- counter_flit seja igual a zero, o sinal counter_flit � inicializado com o valor do flit, pois
-        -- este ao n�mero de flits do corpo do pacote. Caso counter_flit seja diferente de um e de zero
-        -- o mesmo � decrementado e a m�quina de estados permanece em S_PAYLOAD enviando o pr�ximo flit
-        -- do pacote.
-        process(reset, clock)
-        begin
-                if reset='1' then
-                        counter_flit <= (others=>'0');
-                        h <= '0';
-                        data_av <= '0';
-                        sender <=  '0';
-                        first <= (others=>'0');
-                        EA <= S_INIT;
-                elsif clock'event and clock='1' then
-                        case EA is
-                                when S_INIT =>
-                                        counter_flit <= (others=>'0');
-                                        h<='0';
-                                        data_av <= '0';
-                                        if first /= last then -- detectou dado na fila
-                                                h<='1';           -- pede roteamento
-                                                EA <= S_HEADER;
-                                        else
-                                                EA<= S_INIT;
-                                        end if;
-                                when S_HEADER =>
-                                        if ack_h='1' then -- confirma��o de roteamento
-                                                EA <= S_SENDHEADER ;
-                                                h<='0';
-                                                data_av <= '1';
-                                                sender <=  '1';
-                                        else
-                                                EA <= S_HEADER;
-                                        end if;
-                                when S_SENDHEADER  =>
-                                        if data_ack = '1' then  -- confirma��o do envio do header
-                                                -- retira o header do buffer e se tem dado no buffer pede envio do mesmo
-                                                if (first = TAM_BUFFER -1) then
-                                                        first <= (others=>'0');
-                                                        if last /= 0 then data_av <= '1';
-                                                        else data_av <= '0';
-                                                        end if;
-                                                else
-                                                        first <= first+1;
-                                                        if first+1 /= last then data_av <= '1';
-                                                        else data_av <= '0';
-                                                        end if;
-                                                end if;
-                                                EA <= S_PAYLOAD;
-                                        else
-                                                EA <= S_SENDHEADER;
-                                        end if;
-                                when S_PAYLOAD =>
-                                        if data_ack = '1' and counter_flit /= x"1" then -- confirma��o do envio de um dado que n�o � o tail
-                                                -- se counter_flit � zero indica recep��o do size do payload
-                                                if counter_flit = x"0" then    counter_flit <=  buf(CONV_INTEGER(first));
-                                                else counter_flit <= counter_flit - 1;
-                                                end if;
+				when S_HEADER =>
+					-- When the Switch Control confirm the routing
+					if ack_h='1' then					
+						h              <= '0';   -- Disable the routing request 
+						sender         <= '1';   -- Enable wrapper signal to packet transmission
+						data_available <= '1'; 
+						EA             <= S_SENDHEADER ;
+					end if;
 
-                                                -- retira um dado do buffer e se tem dado no buffer pede envio do mesmo
-                                                if (first = TAM_BUFFER -1) then
-                                                        first <= (others=>'0');
-                                                        if last /= 0 then data_av <= '1';
-                                                        else data_av <= '0';
-                                                        end if;
-                                                else
-                                                        first <= first+1;
-                                                        if first+1 /= last then data_av <= '1';
-                                                        else data_av <= '0';
-                                                        end if;
-                                                end if;
-                                                EA <= S_PAYLOAD;
-                                        elsif data_ack = '1' and counter_flit = x"1" then -- confirma��o do envio do tail
-                                                -- retira um dado do buffer
-                                                if (first = TAM_BUFFER -1) then    first <= (others=>'0');
-                                                else first <= first+1;
-                                                end if;
-                                                data_av <= '0';
-                                                sender <=  '0';
-                                                EA <= S_END;
-                                        elsif first /= last then -- se tem dado a ser enviado faz a requisi��o
-                                                data_av <= '1';
-                                                EA <= S_PAYLOAD;
-                                        else
-                                                EA <= S_PAYLOAD;
-                                        end if;
-                                when S_END =>
-                                        data_av <= '0';
-                                        EA <= S_END2;
-                                when S_END2 => -- estado necessario para permitir a libera��o da porta antes da solicita��o de novo envio
-                                        data_av <= '0';
-                                        EA <= S_INIT;
-                        end case;
-                end if;
-        end process;
+				when S_SENDHEADER  =>
+					-- If the data available is read or was read 
+					if data_ack = '1' or data_available = '0' then
+						-- If fifo isn`t empty 
+						if (read_pointer + 1 /= write_pointer) then
+							data_available   <= '1';
+							read_pointer   <= read_pointer + 1;     -- consumes de second flit (payload size)
+							EA <= S_PAYLOAD;
+						-- If fifo is empty (protection clause)
+						else
+							data_available <= '0';
+						end if;
+					end if;
+
+				when S_PAYLOAD =>
+					-- If the data available is read or was read 
+					if data_ack = '1' or data_available = '0' then
+
+						-- If fifo isn`t empty or is tail
+						if (read_pointer + 1 /= write_pointer) or counter_flit = x"1" then
+							-- If the second flit, memorize the packet size
+							if counter_flit = x"0"   then   
+								counter_flit <=  buf(CONV_INTEGER(read_pointer));
+							elsif counter_flit /= x"1" then 
+								counter_flit <=  counter_flit - 1;
+							end if;
+
+							-- If the tail flit
+							if counter_flit = x"1" then
+								-- If tail is send
+								if data_ack = '1' then
+									data_available <= '0';
+									sender <= '0';
+									EA <= S_INIT;
+								else
+									EA <= S_END;
+								end if;
+							-- Else read the next position
+							else
+								data_available <= '1';
+								read_pointer <= read_pointer + 1;
+							end if;
+						-- If fifo is empty (protection clause)
+						else
+							data_available <= '0';
+						end if;
+					end if;
+
+				when S_END =>
+					-- When tail is send
+					if data_ack = '1' then
+						data_available <= '0';
+						sender <= '0';
+						EA <= S_INIT;
+					end if;
+			end case;
+		end if;
+	end process;
+	
+	data_av <= data_available;
 
 end Hermes_buffer;

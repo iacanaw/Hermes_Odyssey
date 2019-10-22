@@ -121,6 +121,8 @@ package standards is
         type buff_dmni is array(0 to TAM_BUFFER_DMNI-1) of regflit;
 
         type arrayNportless1_regmetadeflit is array((NPORT-2) downto 0) of regmetadeflit;
+        type arrayNportless1_2bits is array((NPORT-2) downto 0) of std_logic_vector(1 downto 0);
+
 
         type arrayNport_reg3 is array((NPORT-1) downto 0) of reg3;
         type arrayNport_reg8 is array((NPORT-1) downto 0) of reg8;

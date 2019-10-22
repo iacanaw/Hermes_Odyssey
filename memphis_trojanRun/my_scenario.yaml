@@ -1,7 +1,0 @@
-apps:
-  - name: sorting_divideConquer
-    start_time_ms: 1
-  - name: maliciousApp
-    cluster: 0
-    static_mapping:
-      maliciousTask: [2,2]

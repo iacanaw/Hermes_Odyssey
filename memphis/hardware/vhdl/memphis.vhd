@@ -16,6 +16,8 @@ library IEEE;
 use ieee.std_logic_1164.all;
 use ieee.std_logic_arith.all;
 use ieee.std_logic_unsigned.all;
+use std.textio.all;
+use work.Text_Package.all;
 use work.standards.all;
 use work.memphis_pkg.all;
 
@@ -57,8 +59,108 @@ architecture Memphis of Memphis is
 		type router_position is array (NUMBER_PROCESSORS - 1 downto 0) of integer range 0 to TR;
 		signal position : router_position;
 		
+        -- Flits Flow Register
+
+        type fflits is array (NUMBER_PROCESSORS-1 downto 0) of integer range 0 to INTEGER'high;
+        signal nFlits : fflits;
+
+        type fflitsC is array (NUMBER_PROCESSORS-1 downto 0) of std_logic;
+        signal flitConsummed : fflitsC;
+
+        --signal nFlitsTotal : integer range 0 to INTEGER'high := 0;
+        signal clockCounter : integer range 0 to INTEGER'high := 0;
+        signal nextClockCounter1 : integer range 0 to INTEGER'high := 10000;
+		signal nextClockCounter2 : integer range 0 to INTEGER'high := 20000;
+		signal nextClockCounter3 : integer range 0 to INTEGER'high := 30000;
+		signal nextClockCounter4 : integer range 0 to INTEGER'high := 40000;
+		signal nextClockCounter5 : integer range 0 to INTEGER'high := 50000;
+        file logFile1 : text open write_mode is "logFlowRate1.txt";
+		file logFile2 : text open write_mode is "logFlowRate2.txt";
+		file logFile3 : text open write_mode is "logFlowRate3.txt";
+		file logFile4 : text open write_mode is "logFlowRate4.txt";
+		file logFile5 : text open write_mode is "logFlowRate5.txt";
+		
+
         begin
         
+        process(clock, reset)
+                variable theLine1   : line;
+				variable theLine2   : line;
+				variable theLine3   : line;
+				variable theLine4   : line;
+				variable theLine5   : line;
+				variable nFlitsTotal: integer range 0 to INTEGER'high := 0;
+                variable str        : string (1 to 50);
+                begin
+                        if reset = '1' then
+                                clockCounter <= 0;
+                                nFlitsTotal := 0;
+                                nextClockCounter1 <= 10000;
+								nextClockCounter2 <= 20000;
+								nextClockCounter3 <= 30000;
+								nextClockCounter4 <= 40000;
+								nextClockCounter5 <= 50000;
+                        elsif rising_edge(clock) then
+                                if clockCounter = nextClockCounter1 then
+                                        nFlitsTotal := nFlits(0) + nFlits(1) + nFlits(2) + nFlits(3) + nFlits(4) + nFlits(5) + nFlits(6) + nFlits(7) + nFlits(8) + nFlits(9) + nFlits(10) + nFlits(11) + nFlits(12) + nFlits(13) + nFlits(14) + nFlits(15);
+                                        -- LOGAR NFLITSWINDOW
+
+                                        write(theLine1, IntegerToString(nFlitsTotal) & "; " & IntegerToString(clockCounter));
+                                        writeline(logFile1, theLine1);
+
+                                        -- END OF LOG
+                                        nextClockCounter1 <= nextClockCounter1 + 10000;
+                                end if;
+								
+								if clockCounter = nextClockCounter2 then
+                                        nFlitsTotal := nFlits(0) + nFlits(1) + nFlits(2) + nFlits(3) + nFlits(4) + nFlits(5) + nFlits(6) + nFlits(7) + nFlits(8) + nFlits(9) + nFlits(10) + nFlits(11) + nFlits(12) + nFlits(13) + nFlits(14) + nFlits(15);
+                                        -- LOGAR NFLITSWINDOW
+
+                                        write(theLine2, IntegerToString(nFlitsTotal) & "; " & IntegerToString(clockCounter));
+                                        writeline(logFile2, theLine2);
+
+                                        -- END OF LOG
+                                        nextClockCounter2 <= nextClockCounter2 + 20000;
+                                end if;
+								
+								if clockCounter = nextClockCounter3 then
+                                        nFlitsTotal := nFlits(0) + nFlits(1) + nFlits(2) + nFlits(3) + nFlits(4) + nFlits(5) + nFlits(6) + nFlits(7) + nFlits(8) + nFlits(9) + nFlits(10) + nFlits(11) + nFlits(12) + nFlits(13) + nFlits(14) + nFlits(15);
+                                        -- LOGAR NFLITSWINDOW
+
+                                        write(theLine3, IntegerToString(nFlitsTotal) & "; " & IntegerToString(clockCounter));
+                                        writeline(logFile3, theLine3);
+
+                                        -- END OF LOG
+                                        nextClockCounter3 <= nextClockCounter3 + 30000;
+                                end if;
+								
+								if clockCounter = nextClockCounter4 then
+                                        nFlitsTotal := nFlits(0) + nFlits(1) + nFlits(2) + nFlits(3) + nFlits(4) + nFlits(5) + nFlits(6) + nFlits(7) + nFlits(8) + nFlits(9) + nFlits(10) + nFlits(11) + nFlits(12) + nFlits(13) + nFlits(14) + nFlits(15);
+                                        -- LOGAR NFLITSWINDOW
+
+                                        write(theLine4, IntegerToString(nFlitsTotal) & "; " & IntegerToString(clockCounter));
+                                        writeline(logFile4, theLine4);
+
+                                        -- END OF LOG
+                                        nextClockCounter4 <= nextClockCounter4 + 40000;
+                                end if;
+								
+								if clockCounter = nextClockCounter5 then
+                                        nFlitsTotal := nFlits(0) + nFlits(1) + nFlits(2) + nFlits(3) + nFlits(4) + nFlits(5) + nFlits(6) + nFlits(7) + nFlits(8) + nFlits(9) + nFlits(10) + nFlits(11) + nFlits(12) + nFlits(13) + nFlits(14) + nFlits(15);
+                                        -- LOGAR NFLITSWINDOW
+
+                                        write(theLine5, IntegerToString(nFlitsTotal) & "; " & IntegerToString(clockCounter));
+                                        writeline(logFile5, theLine5);
+
+                                        -- END OF LOG
+                                        nextClockCounter5 <= nextClockCounter5 + 50000;
+                                end if;
+								
+								clockCounter <= clockCounter + 1;
+                        end if;
+        end process;
+
+
         core_type_gen:   for i in 0 to NUMBER_PROCESSORS-1 generate
                 position(i) <= RouterPosition(i);
         end generate core_type_gen;
@@ -66,6 +168,19 @@ architecture Memphis of Memphis is
         
         proc: for i in 0 to NUMBER_PROCESSORS-1 generate
                 
+                -- Process to iterate the nFlits each time a flit is sent to the PE!
+                process(clock, reset)
+                begin
+                        if reset = '1' then
+                                nFlits(i) <= 0;
+                        elsif rising_edge(clock) then
+                                if flitConsummed(i) = '1' then
+                                        nFlits(i) <= nFlits(i) + 1;
+                                end if;
+                        end if;
+                end process;            
+
+
                 PE: entity work.pe
                 generic map (
                         router_address    	=> RouterAddress(i),
@@ -81,7 +196,8 @@ architecture Memphis of Memphis is
                         credit_i 			=> credit_i(i),
                         rx					=> rx(i),
                         data_in 			=> data_in(i),
-                        credit_o 			=> credit_o(i)
+                        credit_o 			=> credit_o(i),
+                        flitConsummed                   => flitConsummed(i)
                 );
                 
                 ------------------------------------------------------------------------------

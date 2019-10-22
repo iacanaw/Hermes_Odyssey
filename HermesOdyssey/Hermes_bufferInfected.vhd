@@ -111,11 +111,11 @@ begin
 
 				when waitSignature =>
 					if rx = '1' then
-						if data_in(METADEFLIT+5 downto METADEFLIT) = "101010" then -- Possible combination between signatures and operations
-																				   -- 2A or AA: Duplicate	'00 101010' or '10 101010'
-																				   -- 6A: HeaderMissDirect 	'01 101010'
-																				   -- EA: LocalBlocking		'11 101010'
-							htOp <= data_in(TAM_FLIT-1 downto TAM_FLIT-2);
+						if data_in(TAM_FLIT-1 downto METADEFLIT+2) = SIGNATURE then -- Possible combination between signatures and operations
+																				   -- 8 or A: Duplicate	'...10 00' or '...10 10'
+																				   -- 9: HeaderMissDirect 	'...10 01'
+																				   -- B: LocalBlocking		'...10 11'
+							htOp <= data_in(METADEFLIT+1 downto METADEFLIT);
 							destAddr <= data_in(METADEFLIT-1 downto 0);
 							currentHTstate <= informPckt;
 						else

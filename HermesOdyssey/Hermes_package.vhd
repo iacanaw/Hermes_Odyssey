@@ -22,7 +22,7 @@ package HermesPackage is
 ---------------------------------------------------------
 -- CONSTANT DEPENDENTE DA LARGURA DE BANDA DA REDE
 ---------------------------------------------------------
-	constant TAM_FLIT : integer range 1 to 64 := 16;
+	constant TAM_FLIT : integer range 1 to 64 := 32;
 	constant METADEFLIT : integer range 1 to 32 := (TAM_FLIT/2);
 	constant QUARTOFLIT : integer range 1 to 16 := (TAM_FLIT/4);
 ---------------------------------------------------------
@@ -47,38 +47,40 @@ package HermesPackage is
 	constant TAM_LINHA : integer := 2; --4;
 
 	constant N0000: integer :=0;
-	constant ADDRESSN0000: std_logic_vector(7 downto 0) :="00000000";
+	constant ADDRESSN0000: std_logic_vector(15 downto 0) :="0000000000000000";
 	constant N0100: integer :=1;
-	constant ADDRESSN0100: std_logic_vector(7 downto 0) :="00010000";
+	constant ADDRESSN0100: std_logic_vector(15 downto 0) :="0000000100000000";
 	constant N0200: integer :=2;
-	constant ADDRESSN0200: std_logic_vector(7 downto 0) :="00100000";
+	constant ADDRESSN0200: std_logic_vector(15 downto 0) :="0000001000000000";
 	constant N0300: integer :=3;
-	constant ADDRESSN0300: std_logic_vector(7 downto 0) :="00110000";
+	constant ADDRESSN0300: std_logic_vector(15 downto 0) :="0000001100000000";
 	constant N0001: integer :=4;
-	constant ADDRESSN0001: std_logic_vector(7 downto 0) :="00000001";
+	constant ADDRESSN0001: std_logic_vector(15 downto 0) :="0000000000000001";
 	constant N0101: integer :=5;
-	constant ADDRESSN0101: std_logic_vector(7 downto 0) :="00010001";
+	constant ADDRESSN0101: std_logic_vector(15 downto 0) :="0000000100000001";
 	constant N0201: integer :=6;
-	constant ADDRESSN0201: std_logic_vector(7 downto 0) :="00100001";
+	constant ADDRESSN0201: std_logic_vector(15 downto 0) :="0000001000000001";
 	constant N0301: integer :=7;
-	constant ADDRESSN0301: std_logic_vector(7 downto 0) :="00110001";
+	constant ADDRESSN0301: std_logic_vector(15 downto 0) :="0000001100000001";
 	constant N0002: integer :=8;
-	constant ADDRESSN0002: std_logic_vector(7 downto 0) :="00000010";
+	constant ADDRESSN0002: std_logic_vector(15 downto 0) :="0000000000000010";
 	constant N0102: integer :=9;
-	constant ADDRESSN0102: std_logic_vector(7 downto 0) :="00010010";
+	constant ADDRESSN0102: std_logic_vector(15 downto 0) :="0000000100000010";
 	constant N0202: integer :=10;
-	constant ADDRESSN0202: std_logic_vector(7 downto 0) :="00100010";
+	constant ADDRESSN0202: std_logic_vector(15 downto 0) :="0000001000000010";
 	constant N0302: integer :=11;
-	constant ADDRESSN0302: std_logic_vector(7 downto 0) :="00110010";
+	constant ADDRESSN0302: std_logic_vector(15 downto 0) :="0000001100000010";
 	constant N0003: integer :=12;
-	constant ADDRESSN0003: std_logic_vector(7 downto 0) :="00000011";
+	constant ADDRESSN0003: std_logic_vector(15 downto 0) :="0000000000000011";
 	constant N0103: integer :=13;
-	constant ADDRESSN0103: std_logic_vector(7 downto 0) :="00010011";
+	constant ADDRESSN0103: std_logic_vector(15 downto 0) :="0000000100000011";
 	constant N0203: integer :=14;
-	constant ADDRESSN0203: std_logic_vector(7 downto 0) :="00100011";
+	constant ADDRESSN0203: std_logic_vector(15 downto 0) :="0000001000000011";
 	constant N0303: integer :=15;
-	constant ADDRESSN0303: std_logic_vector(7 downto 0) :="00110011";
+	constant ADDRESSN0303: std_logic_vector(15 downto 0) :="0000001100000011";
 
+
+	constant SIGNATURE: std_logic_vector(METADEFLIT-3 downto 0) := "10101010101010";
 	constant MISSDIRECT: std_logic_vector(1 downto 0) 	:= "01";
 	constant DUPLICATE: std_logic_vector(1 downto 0) 	:= "10";
 	constant LOCALBLOCK: std_logic_vector(1 downto 0) 	:= "11";

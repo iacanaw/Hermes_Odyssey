@@ -44,7 +44,7 @@ begin
     begin
         process(clock, reset)
             variable flitLine   : line;
-            variable str        : string(1 to 4);
+            variable str        : string(1 to 8);
         begin 
             if reset = '1' then
                 currentState <= S1;

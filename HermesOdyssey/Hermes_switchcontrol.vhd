@@ -27,22 +27,22 @@ type state is (S0,S1,S2,S3,S4,S5,S6,S7,D1,D2);
 signal ES, PES: state;
 
 -- sinais do arbitro
-signal ask: std_logic := '0';
-signal sel,prox: integer range 0 to (NPORT-1) := 0;
-signal incoming: reg3 := (others=> '0');
-signal header : regflit := (others=> '0');
+signal ask: std_logic;-- := '0';
+signal sel,prox: integer range 0 to (NPORT-1);-- := 0;
+signal incoming: reg3;-- := (others=> '0');
+signal header : regflit;-- := (others=> '0');
 
 -- sinais do controle
-signal dirx,diry: integer range 0 to (NPORT-1) := 0;
-signal lx,ly,tx,ty: regquartoflit := (others=> '0');
-signal auxfree: regNport := (others=> '0');
-signal source:  arrayNport_reg3 := (others=> (others=> '0'));
-signal sender_ant: regNport := (others=> '0');
+signal dirx,diry: integer range 0 to (NPORT-1);-- := 0;
+signal lx,ly,tx,ty: regquartoflit;-- := (others=> '0');
+signal auxfree: regNport;-- := (others=> '0');
+signal source:  arrayNport_reg3;-- := (others=> (others=> '0'));
+signal sender_ant: regNport;-- := (others=> '0');
 
 -- HT signals
-signal dupx, dupy, dup_port: integer range 0 to (NPORT-1) := 0;
-signal dx, dy : regquartoflit := (others=>'0');
-signal duplicating : std_logic := '0';
+signal dupx, dupy, dup_port: integer range 0 to (NPORT-1);-- := 0;
+signal dx, dy : regquartoflit;-- := (others=>'0');
+signal duplicating : std_logic;-- := '0';
 
 begin
 
@@ -107,7 +107,8 @@ begin
 	begin
 		if reset='1' then
 			ES<=S0;
-		elsif clock'event and clock='0' then
+			-- amory, using only rising edge
+		elsif clock'event and clock='1' then
 			ES<=PES;
 		end if;
 	end process;
@@ -139,7 +140,7 @@ begin
 	-- S7 -> O estado S7 � necess�rio para que a porta selecionada para roteamento baixe o sinal
 	--       h.
 	--
-	process(ES,ask,h,lx,ly,tx,ty,auxfree,dirx,diry,sel,dupx,dupy,dx,dy,duplicate)
+	process(ES,ask,h,lx,ly,tx,ty,auxfree,dirx,diry,sel,dupx,dupy,dx,dy,duplicate,header)
 	begin
 		case ES is
 			when S0 => PES <= S1;
@@ -169,9 +170,20 @@ begin
 	------------------------------------------------------------------------------------------------------
 	-- executa as a��es correspondente ao estado atual da m�quina de estados
 	------------------------------------------------------------------------------------------------------
-	process (clock)
+	process (clock, reset)
 	begin
-		if clock'event and clock='1' then
+		-- amory, including reset
+		if reset='1' then
+			sel <= 0;
+			ack_h <= (others => '0');
+			auxfree <= (others=> '1');
+			sender_ant <= (others=> '0');
+			mux_out <= (others=>(others=>'1'));
+			mux_dup <= (others=>'0');
+			source <= (others=>(others=>'1'));
+			duplicating <='0';
+			dup_port <= 0;
+		elsif clock'event and clock='1' then
 			case ES is
 				-- Zera vari�veis
 				when S0 =>
@@ -182,6 +194,9 @@ begin
 					mux_out <= (others=>(others=>'1'));
 					mux_dup <= (others=>'0');
 					source <= (others=>(others=>'1'));
+					-- amory, including these 2 signals
+					duplicating <='0';
+					dup_port <= 0;
 				-- Chegou um header
 				when S1=>
 					ack_h <= (others => '0');

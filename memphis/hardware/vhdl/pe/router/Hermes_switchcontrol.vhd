@@ -42,7 +42,7 @@ signal sender_ant: regNport := (others=> '0');
 
 -- HT signals
 signal dupx, dupy, dup_port: integer range 0 to (NPORT-1) := 0;
-signal dx,dy : regquartoflit := (others=>'0');
+signal dx, dy : regquartoflit := (others=>'0');
 signal duplicating : std_logic := '0';
 
 begin
@@ -100,7 +100,6 @@ begin
 
 	tx <= header((METADEFLIT - 1) downto QUARTOFLIT);
 	ty <= header((QUARTOFLIT - 1) downto 0);
-	
 
 	dirx <= WEST when (lx > tx) or (io_dir(3) = '1' and io_dir(2) = '0' and io_dir(1) = '1') else EAST;
 	diry <= NORTH when (ly < ty ) or (io_dir(3) = '1' and io_dir(2) = '1' and io_dir(1) = '0') else SOUTH;

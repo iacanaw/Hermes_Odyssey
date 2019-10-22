@@ -55,7 +55,6 @@ void init_service_header_slots(){
  * \param dmni_msg_size Data size, is represented in memory word of 32 bits
  */
 void DMNI_read_data(unsigned int initial_address, unsigned int dmni_msg_size){
-
 	MemoryWrite(DMNI_SIZE, dmni_msg_size);
 	MemoryWrite(DMNI_OP, WRITE);
 	MemoryWrite(DMNI_ADDRESS, initial_address);

@@ -44,8 +44,8 @@ begin
     variable rand: real;
     variable range_size : real := 32.0;
     variable range_of_rand : real := 65535.0;    -- the range of random values created will be 0 to +1000.
-    begin 
-        if reset = '1' then
+    begin
+        if (reset = '1') then
             currentState <= S0;
         elsif rising_edge(clock) then
  
@@ -117,7 +117,7 @@ begin
     end process;
     data_out <= words;
     tx <= '1' when (currentState = sendPayload) or (currentState = generateHeader) or (currentState = generateSize) else '0';
-    words <= x"00" & destination when currentState = generateHeader else
+    words <= x"0000" & destination when currentState = generateHeader else
              std_logic_vector(to_unsigned(rand_size, TAM_FLIT)) when currentState = generateSize else
              std_logic_vector(to_unsigned(rand_flit, TAM_FLIT));
 
