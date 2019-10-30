@@ -58,12 +58,19 @@ SC_MODULE(memphis) {
 	pe  *	PE[N_PE];//store slaves PEs
 	
 	int i,j;
+
+	// Iaçanã
+	int flits[N_PE][NPORT];
+	int quantumCount, registerAt, clkCount;
+	void logFlowTraffic();
+	//
+
 	
 	int RouterPosition(int router);
 	regaddress RouterAddress(int router);
 	regaddress r_addr;
  	void pes_interconnection();
- 	
+
 	char pe_name[20];
 	int x_addr, y_addr;
 	SC_CTOR(memphis){
@@ -90,7 +97,7 @@ SC_MODULE(memphis) {
 				PE[j]->credit_o[i](credit_o[j][i]);
 			}
 		}
-
+		
 		SC_METHOD(pes_interconnection);
 		sensitive << memphis_app_injector_tx;
 		sensitive << memphis_app_injector_credit_i;
@@ -108,6 +115,13 @@ SC_MODULE(memphis) {
 				sensitive << credit_o[j][i];
 			}
 		}
+
+		// Iaçanã
+		SC_METHOD(logFlowTraffic);
+		sensitive << clock;
+		sensitive << reset;
+		//
 	}
+
 };
 

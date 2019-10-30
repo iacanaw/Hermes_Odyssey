@@ -9,7 +9,7 @@
 #include <stdlib.h>
 #include "prod_cons_std.h"
 
-volatile unsigned int pckt[150];
+volatile unsigned int pckt[152];
 int main(){
 
 	int i, tick;
@@ -29,15 +29,15 @@ int main(){
 	pckt[5] = 0x00000000;
 	pckt[6] = 0x00000000;
 	pckt[7] = 0x00000000;
-	pckt[8] = 0x00000089;
+	pckt[8] = 139;//0x00000089;
 	pckt[9] = 0x00000000;
 	pckt[10] = 0x00000000;
 	pckt[11] = 0x00000000;
 	pckt[12] = 0x00000000;
-	for(i=13; i<150; i++) pckt[i] = 0x00000009;
+	for(i=13; i<152; i++) pckt[i] = 0x00000009;
 	
 	for(i=0; i<PROD_CONS_ITERATIONS; i++){
-		RawSend(pckt, 150);
+		RawSend(pckt, 152);
 	}
 
 	Echo("Fim da aplicacao prod9");

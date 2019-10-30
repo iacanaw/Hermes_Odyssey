@@ -90,6 +90,57 @@ regaddress memphis::RouterAddress(int router){
 	return r_address;	
 }
 
+// Iaçanã
+void memphis::logFlowTraffic(){
+	char aux2[1000];
+	FILE *fp2;
+
+	if(reset.read() == 1){
+		registerAt = 10000;
+		clkCount = 0;
+		quantumCount = 0;
+		for(i = 0; i < N_PE; i++) {
+			for(j = 0; j < NPORT; j++){
+				flits[i][j] = 0;
+			}
+		}
+	}
+	else if (clock.read() == 1){
+		if(registerAt == clkCount){
+			//REGISTRA;
+			quantumCount++;
+			registerAt = registerAt + 10000; //(10ns * 10,000ciclos) = 100,000 ns = 100 us = 0.1 ms
+			//Store in aux the C's string way
+			sprintf(aux2, "debug/trafficMemphis.txt");
+			// Open a file called "aux" deferred on append mode
+			fp2 = fopen (aux2, "a");
+			sprintf(aux2, "Quantum %d\n",quantumCount);
+			fprintf(fp2,"%s",aux2);
+			sprintf(aux2, "Routers, LOCAL, EAST, WEST, NORTH, SOUTH\n");
+			fprintf(fp2,"%s",aux2);
+			for(i = 0; i < N_PE; i++) {
+				sprintf(aux2, "Router %d, %d, %d, %d, %d, %d\n", i, flits[i][LOCAL], flits[i][EAST], flits[i][WEST], flits[i][NORTH], flits[i][SOUTH]);
+				fprintf(fp2,"%s",aux2);
+			}
+			fclose (fp2);
+			//reseta a janela
+			for(i = 0; i < N_PE; i++) {
+				for(j = 0; j < NPORT; j++){
+					flits[i][j] = 0;
+				}
+			}
+		}
+		//incrementa caso o flit passou
+		for(i = 0; i < N_PE; i++) {
+			if((PE[i]->tx[EAST].read() == 1) && (PE[i]->credit_i[EAST].read() == 1)) flits[i][EAST]++;
+			if((PE[i]->tx[WEST].read() == 1) && (PE[i]->credit_i[WEST].read() == 1)) flits[i][WEST]++;
+			if((PE[i]->tx[NORTH].read() == 1) && (PE[i]->credit_i[NORTH].read() == 1)) flits[i][NORTH]++;
+			if((PE[i]->tx[SOUTH].read() == 1) && (PE[i]->credit_i[SOUTH].read() == 1)) flits[i][SOUTH]++;
+			if((PE[i]->rx_ni.read() == 1) && (PE[i]->credit_o_ni.read() == 1)) flits[i][LOCAL]++;
+		}
+		clkCount++;
+	}
+}
 
 void memphis::pes_interconnection(){
  	int i, p;

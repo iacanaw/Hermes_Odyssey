@@ -293,8 +293,8 @@ int Syscall(unsigned int service, unsigned int arg0, unsigned int arg1, unsigned
 			schedule_after_syscall = 1;
 			current->scheduling_ptr->waiting_msg = 1;
 			current->raw_recv = 1;
-			OS_InterruptMaskSet(IRQ_NOC);
-			putsv("Task is waiting message: ", (unsigned int)current->id);
+			putsv("Task is waiting message: ", (unsigned int)current->id);	
+			OS_InterruptMaskSet(IRQ_NOC);			
 			return 0;
 
 		case EXIT:
@@ -721,7 +721,8 @@ int handle_packet(volatile ServiceHeader * p) {
 
 			msg_ptr->length = p->msg_lenght;
 			putsv("Entregando mensagem de tamanho: ",(msg_ptr->length));
-
+			
+			OS_InterruptMaskClear(IRQ_NOC);
 			DMNI_read_data((unsigned int)msg_ptr->msg, msg_ptr->length);
 
 			tcb_ptr->reg[0] = 1;
@@ -746,7 +747,7 @@ int handle_packet(volatile ServiceHeader * p) {
 				need_scheduling = 1;
 			}
 
-			OS_InterruptMaskClear(IRQ_NOC);
+			
 
 			break;
 
