@@ -4,7 +4,7 @@ A simulação apresenta um cenário que provê colisões como observa-se na imag
 
 ![alt text](https://raw.githubusercontent.com/iacanaw/Hermes_Odyssey/master/Cenário.png)
 
-Os PEs 01 e 10 estão realizando injeção de pacotes à uma taxa de 20% com destino os PEs 12 e 21 respectivamente.
+Os PEs 01 e 10 estão realizando injeção de pacotes à uma taxa de 20% com destino os PEs 21 e 12 respectivamente.
 O PE 11 está realizando uma transmissão para o PE 20, esta é a transmissão alvo do Trojan.
 A aplicação maliciosa está inserida em 22, para onde os pacotes duplicados serão enviados.
 
