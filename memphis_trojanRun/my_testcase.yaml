@@ -1,5 +1,5 @@
 hw:
-   page_size_KB: 32        #(mandatory) specifies the page size, must be a value power of two, eg: 8, 16, 32, 64. Most commom value is 32
+   page_size_KB: 64        #(mandatory) specifies the page size, must be a value power of two, eg: 8, 16, 32, 64. Most commom value is 32
    tasks_per_PE: 1          #(mandatory) specifies the number of task per PE, must be a value higher than 0 and lower than 6. Most commom value is 2
    model_description: vhdl  #(mandatory) specifies the system model description: sc (gcc) | scmod (questa) | vhdl
    noc_buffer_size: 8       #(mandatory) must be power of 2.
