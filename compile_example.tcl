@@ -51,7 +51,7 @@ quit -sim
 
 vsim -voptargs=+acc work.topnoc
 
-do wave_apresentacao.do
+do wave_example.do
 
 run 60000 ns
 
