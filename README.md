@@ -42,7 +42,7 @@ The vhdl will be compiled and the simulation will start with the wave:
 ## A Manycore System Simulation - malicious application testing
 
 In this example we will use the a modified version of a Manycore called [Memphis](https://www.inf.pucrs.br/hemps/memphis.html), that is developed by our research group. 
-- [Here](https://github.com/GaphGroup/Memphis/raw/master/tutorials/Tutorial-Memphis-V4-English.pdf) you will find a tutorial of how to install/use it. **To run our modified version, you need to copy the provided directory "*memphis*" to your $MEMPHIS_HOME path.**
+- [Here](https://github.com/GaphGroup/Memphis/raw/master/tutorials/Tutorial-Memphis-V4-English.pdf) you will find a tutorial of how to install/use it. **To run our modified version, you need to use the provided directory "*memphis*" as your $MEMPHIS_HOME.**
 
 We have two scenarios to simulate here:
 1. **Baseline Scenario** *memphis_sortingDivideConquer* - runs an sorting application divided in 15 tasks.
