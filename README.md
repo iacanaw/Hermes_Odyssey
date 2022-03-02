@@ -39,15 +39,16 @@ The vhdl will be compiled and the simulation will start with the wave:
 
 =====================================================================================
 
-A aplicação Sorting Divide and Conquer deve ser executada com a Memphis modificada (RAW_(SEND/RECEIVE)) é necessário copiar a pasta "memphis" para o diretório $HOME para criar um ambiente propício à execução das aplicações.
+## A Manycore System Simulation - malicious application testing
 
-Copie a pasta "memphis_sortingDivideConquer" e "memphis_trojanRun" para este ambiente.
+In this example we will use the a modified version of a Manycore called [Memphis](https://www.inf.pucrs.br/hemps/memphis.html), that is developed by our research group. 
+- [Here](https://github.com/GaphGroup/Memphis/raw/master/tutorials/Tutorial-Memphis-V4-English.pdf) you will find a tutorial of how to install/use it. **To run our modified version, you need to copy the provided directory "*memphis*" to your $MEMPHIS_HOME path.**
 
-Na pasta "memphis_sortingDivideConquer" temos um cenário com apenas a aplicação de sorting, enquanto que na pasta "memphis_trojanRun" encontramos um cenário com a aplicação de sorting e a aplicação maliciosa, roubando dados da aplicação de sorting.
+We have two scenarios to simulate here:
+1. **Baseline Scenario** *memphis_sortingDivideConquer* - runs an sorting application divided in 15 tasks.
+2. **Attack Scenario** *memphis_trojanRun* - runs the same application but with a malicious task running in the system.
 
-Utilize o seguinte comando dentro de cada uma das pastas:
+Use the command to run each scenario.
 
 > memphis-all my_testcase.yaml my_scenario.yaml 10
-
-(a execução da simulação "memphis_trojanRun" é lenta pois é feita utilizando VHDL)
 
